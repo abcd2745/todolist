@@ -1,7 +1,5 @@
 # Agent Team 模式详细指南
 
-> **用途**: 本文档为 Agent Team 模式的完整规范，CLAUDE.md 中只保留精简版
-
 ---
 
 ## 概述
@@ -262,7 +260,3 @@ Dr. Emily: "我觉得 Celery 的配置应该..."
 - [React Documentation](https://react.dev/)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
 
----
-
-**最后更新**: 2026-03-07
-**维护者**: 项目团队

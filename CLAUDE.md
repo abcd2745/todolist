@@ -2,9 +2,8 @@
 
 ## 项目概要
 
-**项目**：游戏化待办应用 | **核心理念**：理解我、帮助我、不评判我
-**技术栈**：React 18 + FastAPI + PostgreSQL 17
-**当前阶段**：开发 W1 | **下一步**：数据库 Schema 设计
+**项目**：游戏化待办应用 
+**核心理念**：理解我、帮助我成长、不评判我
 
 ---
 
@@ -28,15 +27,13 @@
 ### 🟡 P1 - 根据任务类型加载（中优先级）
 
 **智能加载规则**：
-- **前端开发任务** → `docs/meetings/phase_01_planning/discussions/frontend_design.md`（前端设计决策）
-- **后端开发任务** → `docs/meetings/phase_01_planning/discussions/technical_architecture.md`（技术架构决策）
 - **AI 集成任务** → `docs/design/plan_start_01.md`（游戏化机制详解）
-- **团队协作任务** → `docs/requirements/team_organization_meeting_plan.md`（团队角色职责）
+- **团队协作任务** → `docs/team_organization_meeting_plan.md`（团队角色职责）
 
 ### 🟢 P2 - 需要时加载（低优先级）
 
-- `docs/requirements/discussion_record_01.md` - 第一次多角色讨论会
-- `docs/requirements/discussion_record_02_longterm_learning.md` - 第二次讨论会
+- `docs/requirements/discussions/discussion_record_01.md` - 第一次多角色讨论会
+- `docs/requirements/discussions/discussion_record_02_longterm_learning.md` - 第二次讨论会
 
 ---
 
@@ -152,40 +149,9 @@
 
 ---
 
-## 技术决策摘要
-
-### 技术栈（详情见 `docs/meetings/phase_01_planning/conclusion.md`）
-- 前端：React 18 + TypeScript + Zustand + Framer Motion
-- 后端：Python 3.11 + FastAPI + SQLAlchemy 2.0
-- 数据库：PostgreSQL 17 + TimescaleDB 2.13
-- CI/CD：Jenkins + Docker Compose
-
-### 架构原则
-- 单一数据库，无 Redis（使用 PG 内置缓存）
-- AI 是建议者，用户有最终编辑权
-- 所有文案必须通过"非评判性"检查
-
----
-
-## 开发工作流
-
-### Git 分支
-```
-main ← develop ← feature/*
-```
-
-### 提交规范
-- `feat:` 新功能 | `fix:` 修复 | `docs:` 文档 | `refactor:` 重构
-
-### 质量门禁
-- 单元测试覆盖率 > 80%
-- PR 需 CI 通过 + 1 人审查
-
----
-
 ## 核心设计原则
 
-### 产品理念（详见 `docs/requirements/requirements_document_v1.md`）
+### 产品理念（详见 `docs/requirements/requirements_document.md`）
 
 1. **理解我、帮助我、不评判我** - 所有文案、交互、反馈必须通过此检查
 2. **数据服务于理解，而非焦虑** - 强调"发现"而非"问题"
@@ -204,11 +170,6 @@ main ← develop ← feature/*
 ---
 
 ## 文档维护原则
-
-### CLAUDE.md（本文档）
-- **性质**：静态核心规范
-- **更新频率**：极少（仅在核心规范变更时）
-- **内容**：核心需求、工作流程、技术决策摘要
 
 ### docs/progress.md
 - **性质**：动态项目进度
