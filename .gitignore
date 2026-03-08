@@ -1,2 +1,5 @@
 ## 忽略git
 .git
+
+
+.mcp.json
