@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>步骤4：清理环境 - 极简开发环境教程</title>
+    <link rel="stylesheet" href="common.css">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="index.html">📚 教程首页</a>
+            <a href="index.html">返回首页 →</a>
+        </nav>
+
+        <header>
+            <h1>步骤4：清理环境</h1>
+            <div class="subtitle">删除Schema，重置开发环境</div>
+        </header>
+
+        <!-- 进度指示器 -->
+        <div class="progress-indicator">
+            <a href="step1-database.html" class="step-dot completed">
+                <div class="dot">✓</div>
+                <div class="step-label">启动数据库</div>
+            </a>
+            <a href="step2-create-schema.html" class="step-dot completed">
+                <div class="dot">✓</div>
+                <div class="step-label">创建Schema</div>
+            </a>
+            <a href="step3-development.html" class="step-dot completed">
+                <div class="dot">✓</div>
+                <div class="step-label">开始开发</div>
+            </a>
+            <a href="step4-cleanup.html" class="step-dot active">
+                <div class="dot">4</div>
+                <div class="step-label">清理环境</div>
+            </a>
+        </div>
+
+        <div class="content">
+            <!-- 理论说明 -->
+            <section class="fade-in">
+                <h2>📖 理论说明</h2>
+
+                <div class="theory-card">
+                    <h3><span class="icon">🗑️</span> DROP SCHEMA原理</h3>
+                    <p><strong>删除Schema的核心命令</strong>：</p>
+                    <div class="command-box" style="margin-top: 10px;">
+                        <code>-- 删除Schema（必须为空）
+DROP SCHEMA agent_1;
+
+-- 删除Schema及其所有对象（CASCADE）
+DROP SCHEMA agent_1 CASCADE;</code>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                    <div class="tips-box" style="margin-top: 15px;">
+                        <h4>⚠️ CASCADE的作用</h4>
+                        <p><strong>CASCADE</strong>会自动删除Schema中的所有对象（表、视图、函数等），无需手动删除每个对象。</p>
+                        <p style="margin-top: 10px;"><strong>注意</strong>：这是一个<strong>不可逆操作</strong>，数据将永久删除。</p>
+                    </div>
+                </div>
+
+                <div class="theory-card">
+                    <h3><span class="icon">⚡</span> 为什么清理很重要？</h3>
+                    <ul style="padding-left: 20px;">
+                        <li><strong>释放资源</strong>：删除不再使用的表和数据，节省存储空间</li>
+                        <li><strong>避免干扰</strong>：防止旧数据干扰新的测试</li>
+                        <li><strong>保持整洁</strong>：维护干净的数据库环境</li>
+                        <li><strong>团队协作</strong>：清理个人环境，不影响其他Agent</li>
+                    </ul>
+                </div>
+
+                <div class="theory-card">
+                    <h3><span class="icon">🔄</span> Schema重建</h3>
+                    <p><strong>清理后如何重新创建？</strong></p>
+                    <p style="margin-top: 10px;">删除Schema后，可以立即重新创建，实现环境重置：</p>
+                    <div class="command-box" style="margin-top: 10px;">
+                        <code>-- 清理
+DROP SCHEMA agent_1 CASCADE;
+
+-- 重建
+CREATE SCHEMA agent_1;
+GRANT ALL PRIVILEGES ON SCHEMA agent_1 TO dev;</code>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 实际操作 -->
+            <section class="fade-in" style="margin-top: 40px;">
+                <h2>🔧 实际操作</h2>
+
+                <h3>1. 查看当前Schema状态</h3>
+
+                <div class="command-box">
+                    <code>-- 查看所有Schema
+\dn
+
+-- 查看Schema中的表
+SET search_path TO agent_1;
+\dt</code>
+                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                </div>
+
+                <div class="output-box success" style="margin-top: 15px;">
+         Name        | Owner
+--------------------+-------
+ agent_1            | dev
+ agent_2            | dev
+ public             | dev
+(3 rows)
+
+           List of relations
+  Schema  | Name  | Type  | Owner
+----------+-------+-------+-------
+ agent_1  | tasks | table | dev
+ agent_1  | users | table | dev
+(2 rows)
+                </div>
+
+                <h3 style="margin-top: 30px;">2. 使用脚本清理Schema</h3>
+
+                <div class="command-box">
+                    <code>./scripts/agent-env.sh agent_1 clean</code>
+                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                </div>
+
+                <div class="output-box warning" style="margin-top: 15px;">
+========================================
+  🧹 清理Agent环境: agent_1
+========================================
+确认删除Schema 'agent_1'？(y/N): y
+✅ Schema已删除
+                </div>
+
+                <h3 style="margin-top: 30px;">3. 验证清理结果</h3>
+
+                <div class="command-box">
+                    <code>-- 查看Schema列表
+\dn
+
+-- 尝试切换到agent_1
+SET search_path TO agent_1;</code>
+                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                </div>
+
+                <div class="output-box error" style="margin-top: 15px;">
+         Name        | Owner
+--------------------+-------
+ agent_2            | dev
+ public             | dev
+(2 rows)
+
+ERROR:  schema "agent_1" does not exist
+                </div>
+
+                <h3 style="margin-top: 30px;">4. 批量清理（高级）</h3>
+
+                <div class="command-box">
+                    <code># 清理所有agent_*开头的Schema
+for schema in $(docker exec -i todolist-db psql -U dev -d todolist -t -c \
+  "SELECT schema_name FROM information_schema.schemata WHERE schema_name LIKE 'agent_%';"); do
+    echo "清理: $schema"
+    docker exec -i todolist-db psql -U dev -d todolist -c "DROP SCHEMA IF EXISTS $schema CASCADE;"
+done</code>
+                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                </div>
+
+                <h3 style="margin-top: 30px;">5. 重置环境（清理+重建）</h3>
+
+                <div class="command-box">
+                    <code># 方式1: 使用reset命令
+./scripts/agent-env.sh agent_1 reset
+
+# 方式2: 手动清理+重建
+./scripts/agent-env.sh agent_1 clean
+./scripts/agent-env.sh agent_1 create</code>
+                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                </div>
+
+                <div class="output-box success" style="margin-top: 15px;">
+🔄 重置Agent环境: agent_1
+========================================
+  🧹 清理Agent环境: agent_1
+========================================
+确认删除Schema 'agent_1'？(y/N): y
+✅ Schema已删除
+
+========================================
+  🚀 创建Agent环境: agent_1
+========================================
+📝 创建Schema: agent_1
+✅ Agent环境就绪！
+                </div>
+            </section>
+
+            <!-- 参考资料 -->
+            <section class="fade-in" style="margin-top: 40px;">
+                <h2>📚 参考资料</h2>
+
+                <div class="links-card">
+                    <h4>🔗 SQL语法</h4>
+                    <ul>
+                        <li>
+                            <strong>DROP SCHEMA文档</strong><br>
+                            <a href="https://www.postgresql.org/docs/current/sql-dropschema.html" target="_blank">
+                                PostgreSQL DROP SCADA Documentation
+                            </a>
+                        </li>
+                        <li>
+                            <strong>CASCADE详解</strong><br>
+                            <a href="https://www.postgresql.org/docs/current/ddl-depend.html" target="_blank">
+                                Dependency Tracking
+                            </a>
+                        </li>
+                        <li>
+                            <strong>information_schema</strong><br>
+                            <a href="https://www.postgresql.org/docs/current/infoschema-schema.html" target="_blank">
+                                The Information Schema
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="links-card">
+                    <h4>📖 自动化运维</h4>
+                    <ul>
+                        <li>
+                            <strong>定时清理任务</strong><br>
+                            <a href="https://www.postgresql.org/docs/current/maintenance.html" target="_blank">
+                                Routine Vacuuming
+                            </a>
+                        </li>
+                        <li>
+                            <strong>pgAgent调度工具</strong><br>
+                            <a href="https://www.pgadmin.org/docs/pgadmin4/development/pgagent.html" target="_blank">
+                                pgAgent Documentation
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 最佳实践 -->
+            <section class="fade-in" style="margin-top: 40px;">
+                <h2>💡 最佳实践</h2>
+
+                <div class="tips-box">
+                    <h4>清理时机建议</h4>
+                    <table style="width: 100%; margin-top: 10px;">
+                        <tr style="background: #f0f0f0;">
+                            <th style="padding: 10px;">场景</th>
+                            <th style="padding: 10px;">建议时机</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px;">开发完成</td>
+                            <td style="padding: 10px;">代码提交后</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px;">测试完成</td>
+                            <td style="padding: 10px;">测试通过后</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px;">环境重置</td>
+                            <td style="padding: 10px;">遇到难以解决的问题时</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px;">长期不使用</td>
+                            <td style="padding: 10px;">超过1周未使用</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="tips-box">
+                    <h4>自动化清理脚本示例</h4>
+                    <div class="command-box">
+                        <code>#!/bin/bash
+# scripts/cleanup-old-schemas.sh
+
+# 清理超过7天未使用的Schema
+THRESHOLD_DAYS=7
+
+unused_schemas=$(docker exec -i todolist-db psql -U dev -d todolist -t -c "
+SELECT schema_name
+FROM information_schema.schemata
+WHERE schema_name LIKE 'agent_%'
+  AND schema_name NOT IN (
+    SELECT DISTINCT schemaname
+    FROM pg_stat_user_tables
+    WHERE last_seq_scan > NOW() - INTERVAL '$THRESHOLD_DAYS days'
+  );
+")
+
+for schema in $unused_schemas; do
+    echo "清理未使用Schema: $schema"
+    docker exec -i todolist-db psql -U dev -d todolist -c "DROP SCHEMA IF EXISTS $schema CASCADE;"
+done</code>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 常见问题 -->
+            <section class="fade-in" style="margin-top: 40px;">
+                <h2>❓ 常见问题</h2>
+
+                <div class="tips-box">
+                    <h4>Q: 清理Schema会影响其他Agent吗？</h4>
+                    <p><strong>A:</strong> 不会。每个Schema完全独立，清理agent_1不会影响agent_2或其他任何Schema。</p>
+                </div>
+
+                <div class="tips-box">
+                    <h4>Q: 如何恢复误删的Schema？</h4>
+                    <p><strong>A:</strong> Schema删除后<strong>无法直接恢复</strong>，只能：</p>
+                    <ol style="margin-top: 10px; padding-left: 20px;">
+                        <li>从备份恢复（如果有备份）</li>
+                        <li>重新创建Schema并重新导入数据</li>
+                    </ol>
+                    <p style="margin-top: 10px; color: #dc3545;"><strong>强烈建议</strong>：清理前先备份数据！</p>
+                </div>
+
+                <div class="tips-box">
+                    <h4>Q: 如何备份Schema？</h4>
+                    <div class="command-box">
+                        <code># 备份单个Schema
+docker exec todolist-db pg_dump -U dev -n agent_1 todolist > backup_agent1.sql
+
+# 恢复
+cat backup_agent1.sql | docker exec -i todolist-db psql -U dev -d todolist</code>
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                    </div>
+                </div>
+
+                <div class="tips-box">
+                    <h4>Q: DROP SCHEMA CASCADE安全吗？</h4>
+                    <p><strong>A:</strong> CASCADE会级联删除所有依赖对象，在清理场景下是安全的，因为我们要删除的就是整个Schema及其所有内容。</p>
+                    <p style="margin-top: 10px;"><strong>注意</strong>：生产环境慎用CASCADE，建议先检查依赖关系。</p>
+                </div>
+            </section>
+
+            <!-- 完整流程回顾 -->
+            <section class="fade-in" style="margin-top: 40px;">
+                <h2>🎯 完整工作流程回顾</h2>
+
+                <div style="background: #f8f9fa; padding: 30px; border-radius: 15px; margin-top: 20px;">
+                    <h3 style="margin-bottom: 20px;">从领取任务到清理环境</h3>
+
+                    <div style="background: white; padding: 20px; border-left: 5px solid #667eea; margin-bottom: 15px;">
+                        <strong>Step 1: 启动数据库</strong>
+                        <pre style="margin-top: 10px; font-family: monospace;">docker-compose up -d</pre>
+                    </div>
+
+                    <div style="background: white; padding: 20px; border-left: 5px solid #667eea; margin-bottom: 15px;">
+                        <strong>Step 2: 创建Schema</strong>
+                        <pre style="margin-top: 10px; font-family: monospace;">./scripts/agent-env.sh agent_1 create</pre>
+                    </div>
+
+                    <div style="background: white; padding: 20px; border-left: 5px solid #667eea; margin-bottom: 15px;">
+                        <strong>Step 3: 开发测试</strong>
+                        <pre style="margin-top: 10px; font-family: monospace;"># 连接数据库
+docker exec -it todolist-db psql -U dev -d todolist
+SET search_path TO agent_1;
+# 创建表、插入数据、测试...</pre>
+                    </div>
+
+                    <div style="background: white; padding: 20px; border-left: 5px solid #667eea; margin-bottom: 15px;">
+                        <strong>Step 4: 清理环境</strong>
+                        <pre style="margin-top: 10px; font-family: monospace;">./scripts/agent-env.sh agent_1 clean</pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 下一步 -->
+            <section class="fade-in" style="margin-top: 40px; text-align: center;">
+                <a href="step3-development.html" class="btn btn-secondary">← 上一步</a>
+                <a href="index.html" class="btn btn-success">返回首页</a>
+            </section>
+        </div>
+
+        <footer>
+            <p>🎉 极简开发环境 - 让开发更简单</p>
+            <p style="margin-top: 10px; opacity: 0.7;">步骤4/4 - 教程完成！</p>
+        </footer>
+    </div>
+
+    <script src="common.js"></script>
+</body>
+</html>

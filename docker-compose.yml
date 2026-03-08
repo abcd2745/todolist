@@ -1,0 +1,29 @@
+version: '3.8'
+
+# =============================================================================
+# 简化版Docker Compose配置 - Phase 1: 最小可用环境
+# =============================================================================
+# 目标：5分钟内启动数据库，立即可用
+# 扩展：项目初始化后添加应用容器
+# =============================================================================
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: todolist-db
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev_password
+      POSTGRES_DB: todolist
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

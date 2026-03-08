@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏化待办系统 - 任务详情</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 16px;
+            padding: 20px 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 14px;
+            color: #667eea;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .back-btn:hover {
+            background: #f3f4f6;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Task Detail Card */
+        .task-detail {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .task-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .task-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .meta-item {
+            background: #f9fafb;
+            padding: 16px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .meta-icon {
+            font-size: 24px;
+        }
+
+        .meta-content {
+            flex: 1;
+        }
+
+        .meta-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .meta-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .quadrant-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .quadrant-badge.q1 {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .quadrant-badge.q2 {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .quadrant-badge.q3 {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .quadrant-badge.q4 {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-badge.in-progress {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .status-badge.completed {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .tag {
+            padding: 6px 12px;
+            background: #f3f4f6;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-content {
+            color: #4b5563;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        /* Markdown Editor */
+        .markdown-editor {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .markdown-toolbar {
+            background: #f9fafb;
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            gap: 8px;
+        }
+
+        .toolbar-btn {
+            background: white;
+            border: 1px solid #e5e7eb;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .toolbar-btn:hover {
+            background: #f3f4f6;
+        }
+
+        .markdown-content {
+            padding: 16px;
+            min-height: 300px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            color: #374151;
+        }
+
+        .checklist input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checklist label {
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .checklist input:checked + label {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+
+        /* Optional Fields */
+        .optional-fields {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .action-buttons .btn {
+            flex: 1;
+            padding: 14px;
+            font-size: 16px;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .task-detail {
+                padding: 20px;
+            }
+
+            .task-title {
+                font-size: 24px;
+            }
+
+            .task-meta {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        /* Stars */
+        .stars {
+            color: #fbbf24;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <button class="back-btn" onclick="window.location.href='home.html'">← 返回四象限</button>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary">✎ 编辑任务</button>
+                <button class="btn btn-danger">🗑 删除任务</button>
+            </div>
+        </div>
+
+        <!-- Task Detail -->
+        <div class="task-detail">
+            <div class="task-title">
+                <span>📋</span>
+                完成项目API设计
+            </div>
+
+            <!-- Meta Information -->
+            <div class="task-meta">
+                <div class="meta-item">
+                    <div class="meta-icon">🔥</div>
+                    <div class="meta-content">
+                        <div class="meta-label">象限</div>
+                        <div class="meta-value">
+                            <span class="quadrant-badge q1">紧急且重要</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="meta-item">
+                    <div class="meta-icon">📊</div>
+                    <div class="meta-content">
+                        <div class="meta-label">状态</div>
+                        <div class="meta-value">
+                            <span class="status-badge in-progress">进行中</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="meta-item">
+                    <div class="meta-icon">⭐</div>
+                    <div class="meta-content">
+                        <div class="meta-label">难度</div>
+                        <div class="meta-value stars">⭐⭐⭐⭐</div>
+                    </div>
+                </div>
+
+                <div class="meta-item">
+                    <div class="meta-icon">💰</div>
+                    <div class="meta-content">
+                        <div class="meta-label">XP 奖励</div>
+                        <div class="meta-value" style="color: #f59e0b; font-weight: bold;">+48 XP</div>
+                    </div>
+                </div>
+
+                <div class="meta-item">
+                    <div class="meta-icon">📅</div>
+                    <div class="meta-content">
+                        <div class="meta-label">截止日期</div>
+                        <div class="meta-value">2026-03-10</div>
+                    </div>
+                </div>
+
+                <div class="meta-item">
+                    <div class="meta-icon">⏱</div>
+                    <div class="meta-content">
+                        <div class="meta-label">预估用时</div>
+                        <div class="meta-value">120 分钟</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tags -->
+            <div class="tags">
+                <span class="tag">🏷 工作</span>
+                <span class="tag">🏷 重要</span>
+                <span class="tag">🏷 API</span>
+                <span class="tag">🏷 后端</span>
+            </div>
+
+            <!-- Description -->
+            <div class="section">
+                <div class="section-title">📝 任务描述</div>
+                <div class="section-content">
+设计RESTful API接口，包括用户模块、任务模块、游戏化系统等核心功能的API定义。需要遵循API设计最佳实践。
+                </div>
+            </div>
+
+            <!-- Markdown Content -->
+            <div class="section">
+                <div class="section-title">
+                    📋 详细内容 (Markdown)
+                    <button class="btn btn-primary" style="margin-left: auto; padding: 6px 12px; font-size: 12px;">编辑内容</button>
+                </div>
+                <div class="markdown-editor">
+                    <div class="markdown-toolbar">
+                        <button class="toolbar-btn">B</button>
+                        <button class="toolbar-btn">I</button>
+                        <button class="toolbar-btn">H1</button>
+                        <button class="toolbar-btn">H2</button>
+                        <button class="toolbar-btn">🔗</button>
+                        <button class="toolbar-btn">📷</button>
+                        <button class="toolbar-btn">📝</button>
+                    </div>
+                    <div class="markdown-content"># API设计任务
+
+## 背景说明
+游戏化待办系统需要完整的API支持，包括：
+- 用户认证与管理
+- 任务CRUD操作
+- 游戏化系统集成
+- 数据分析接口
+
+## 行动计划
+1. 定义API规范 ✓
+2. 设计数据结构
+3. 编写API文档
+
+## Checklist
+- [x] 用户模块API
+- [x] 任务模块API
+- [ ] 游戏化API
+- [ ] 数据分析API</div>
+                </div>
+            </div>
+
+            <!-- Optional Fields -->
+            <div class="optional-fields">
+                <div class="form-group">
+                    <label class="form-label">
+                        <span>⏱</span> 实际用时 (可选)
+                    </label>
+                    <input type="number" class="form-input" placeholder="100" value="100">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span>💭</span> 完成反思 (可选)
+                    </label>
+                    <textarea class="form-textarea" placeholder="记录你的想法...">这个任务比预期快完成了，因为之前有相关经验。下次可以更准确地预估时间。</textarea>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="window.location.href='home.html'">取消</button>
+                <button class="btn btn-success" onclick="completeTask()">✅ 完成任务</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function completeTask() {
+            if (confirm('确定要完成这个任务吗？')) {
+                alert('🎉 任务完成！获得 48 XP');
+                window.location.href = 'home.html';
+            }
+        }
+    </script>
+</body>
+</html>

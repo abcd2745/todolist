@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏化待办系统 - 注册</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .register-container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .logo-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .logo-title {
+            font-size: 26px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 6px;
+        }
+
+        .logo-subtitle {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #64748b;
+            box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #cbd5e1;
+        }
+
+        .password-hint {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 4px;
+            padding-left: 2px;
+        }
+
+        .password-hint.valid {
+            color: #059669;
+        }
+
+        .password-hint.valid::before {
+            content: '✓ ';
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: #64748b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 6px;
+        }
+
+        .btn-primary:hover {
+            background: #475569;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 100%;
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        .divider-text {
+            position: relative;
+            background: white;
+            padding: 0 12px;
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .social-login {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .social-btn {
+            width: 44px;
+            height: 44px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .social-btn:hover {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .footer-link {
+            color: #475569;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Password visibility toggle */
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #94a3b8;
+        }
+
+        .strength-meter {
+            margin-top: 6px;
+            height: 3px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            transition: all 0.2s;
+        }
+
+        .strength-weak { width: 33%; background: #ef4444; }
+        .strength-medium { width: 66%; background: #f59e0b; }
+        .strength-strong { width: 100%; background: #059669; }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .register-container {
+                padding: 28px 24px;
+            }
+
+            .logo-title {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="logo">
+            <div class="logo-icon">📋</div>
+            <div class="logo-title">创建账号</div>
+            <div class="logo-subtitle">开启你的任务管理之旅</div>
+        </div>
+
+        <form onsubmit="handleRegister(event)">
+            <div class="form-group">
+                <label class="form-label">
+                    <span>👤</span> 用户名
+                </label>
+                <input type="text" class="form-input" placeholder="你的名字" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <span>📧</span> 邮箱
+                </label>
+                <input type="email" class="form-input" placeholder="your@email.com" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <span>🔒</span> 密码
+                </label>
+                <div class="password-wrapper">
+                    <input type="password" class="form-input" id="password" placeholder="••••••••" required oninput="checkPasswordStrength()">
+                    <button type="button" class="password-toggle" onclick="togglePassword()">👁</button>
+                </div>
+                <div class="strength-meter">
+                    <div class="strength-fill" id="strengthFill"></div>
+                </div>
+                <div class="password-hint" id="passwordHint">
+                    至少8位，包含大小写字母和数字
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <span>🔒</span> 确认密码
+                </label>
+                <div class="password-wrapper">
+                    <input type="password" class="form-input" id="confirmPassword" placeholder="••••••••" required oninput="checkPasswordMatch()">
+                    <button type="button" class="password-toggle" onclick="toggleConfirmPassword()">👁</button>
+                </div>
+                <div class="password-hint" id="matchHint" style="display: none;">
+                    密码匹配
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary">创建账号</button>
+        </form>
+
+        <div class="divider">
+            <span class="divider-text">或使用第三方登录</span>
+        </div>
+
+        <div class="social-login">
+            <button class="social-btn" title="Google">🔴</button>
+            <button class="social-btn" title="GitHub">⚫</button>
+            <button class="social-btn" title="WeChat">🟢</button>
+        </div>
+
+        <div class="footer-text">
+            已有账号？<a href="login.html" class="footer-link">立即登录</a>
+        </div>
+    </div>
+
+    <script>
+        function handleRegister(event) {
+            event.preventDefault();
+            window.location.href = 'home.html';
+        }
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = passwordInput.nextElementSibling;
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = '👁‍🗨';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = '👁';
+            }
+        }
+
+        function toggleConfirmPassword() {
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const toggleBtn = confirmPasswordInput.nextElementSibling;
+
+            if (confirmPasswordInput.type === 'password') {
+                confirmPasswordInput.type = 'text';
+                toggleBtn.textContent = '👁‍🗨';
+            } else {
+                confirmPasswordInput.type = 'password';
+                toggleBtn.textContent = '👁';
+            }
+        }
+
+        function checkPasswordStrength() {
+            const password = document.getElementById('password').value;
+            const strengthFill = document.getElementById('strengthFill');
+            const passwordHint = document.getElementById('passwordHint');
+
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+            if (/\d/.test(password)) strength++;
+            if (/[^a-zA-Z0-9]/.test(password)) strength++;
+
+            strengthFill.className = 'strength-fill';
+            if (strength <= 1) {
+                strengthFill.classList.add('strength-weak');
+                passwordHint.classList.remove('valid');
+                passwordHint.textContent = '密码强度：弱';
+            } else if (strength <= 2) {
+                strengthFill.classList.add('strength-medium');
+                passwordHint.classList.remove('valid');
+                passwordHint.textContent = '密码强度：中等';
+            } else {
+                strengthFill.classList.add('strength-strong');
+                passwordHint.classList.add('valid');
+                passwordHint.textContent = '密码强度：强';
+            }
+
+            checkPasswordMatch();
+        }
+
+        function checkPasswordMatch() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const matchHint = document.getElementById('matchHint');
+
+            if (confirmPassword.length > 0) {
+                matchHint.style.display = 'block';
+                if (password === confirmPassword) {
+                    matchHint.classList.add('valid');
+                    matchHint.textContent = '✓ 密码匹配';
+                } else {
+                    matchHint.classList.remove('valid');
+                    matchHint.textContent = '✗ 密码不匹配';
+                    matchHint.style.color = '#ef4444';
+                }
+            } else {
+                matchHint.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

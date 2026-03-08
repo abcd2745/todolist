@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏化待办系统 - 数据分析</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 14px 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        /* 导航菜单 */
+        .nav-menu {
+            display: flex;
+            gap: 4px;
+            background: #f8fafc;
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .nav-item {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #64748b;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-item:hover {
+            background: white;
+            color: #475569;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-item.active {
+            background: white;
+            color: #64748b;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-menu {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .page-title {
+            color: #1e293b;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        /* Daily Report */
+        .report-section {
+            margin-bottom: 16px;
+        }
+
+        .report-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .report-content {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 14px;
+            color: #4b5563;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: #6b7280;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        /* Chart placeholders */
+        .chart-placeholder {
+            height: 200px;
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            font-size: 14px;
+            margin-top: 16px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-top: 12px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+
+        /* Achievement Grid */
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .achievement-item {
+            text-align: center;
+            padding: 16px;
+            background: #f9fafb;
+            border-radius: 12px;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .achievement-item:hover {
+            transform: translateY(-4px);
+        }
+
+        .achievement-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .achievement-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+
+        .achievement-desc {
+            font-size: 10px;
+            color: #6b7280;
+        }
+
+        .achievement-item.locked {
+            opacity: 0.5;
+        }
+
+        /* Quadrant Distribution */
+        .quadrant-dist {
+            margin-top: 16px;
+        }
+
+        .quadrant-bar {
+            height: 40px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quadrant-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            100% { left: 100%; }
+        }
+
+        .q1-bar {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+            width: 22%;
+        }
+
+        .q2-bar {
+            background: linear-gradient(90deg, #3b82f6, #2563eb);
+            width: 48%;
+        }
+
+        .q3-bar {
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+            width: 20%;
+        }
+
+        .q4-bar {
+            background: linear-gradient(90deg, #10b981, #059669);
+            width: 10%;
+        }
+
+        /* Radar Chart Placeholder */
+        .radar-chart {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 16px auto;
+        }
+
+        .radar-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid #e5e7eb;
+        }
+
+        .radar-axis {
+            position: absolute;
+            width: 2px;
+            height: 50%;
+            background: #e5e7eb;
+            left: 50%;
+            top: 0;
+            transform-origin: bottom center;
+        }
+
+        .radar-axis:nth-child(2) { transform: rotate(90deg); }
+        .radar-axis:nth-child(3) { transform: rotate(180deg); }
+        .radar-axis:nth-child(4) { transform: rotate(270deg); }
+
+        .radar-shape {
+            position: absolute;
+            width: 70%;
+            height: 70%;
+            top: 15%;
+            left: 15%;
+            background: rgba(102, 126, 234, 0.3);
+            border: 2px solid #667eea;
+            clip-path: polygon(50% 0%, 85% 35%, 75% 85%, 25% 85%, 15% 35%);
+        }
+
+        .radar-label {
+            position: absolute;
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .radar-label.top { top: -20px; left: 50%; transform: translateX(-50%); }
+        .radar-label.right { right: -40px; top: 50%; transform: translateY(-50%); }
+        .radar-label.bottom { bottom: -20px; left: 50%; transform: translateX(-50%); }
+        .radar-label.left { left: -40px; top: 50%; transform: translateY(-50%); }
+
+        /* Weekly Report */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .metric-card {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .metric-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metric-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .achievement-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .header {
+                padding: 16px;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="logo">📋 任务管理</div>
+                <nav class="nav-menu">
+                    <a href="home.html" class="nav-item">🏠 主页</a>
+                    <a href="analytics.html" class="nav-item active">📊 数据分析</a>
+                    <a href="achievements.html" class="nav-item">🏆 成就殿堂</a>
+                </nav>
+            </div>
+            <div class="user-menu">👤</div>
+        </div>
+
+        <!-- Page Title -->
+        <h1 class="page-title">数据分析</h1>
+
+        <!-- Daily Report -->
+        <div class="card">
+            <div class="card-title">
+                <span>📅</span> 今日简报 - 2026年3月8日
+            </div>
+
+            <div class="grid">
+                <div class="report-section">
+                    <div class="report-label">✅ 昨日回顾</div>
+                    <div class="report-content">
+                        <div class="stat-row">
+                            <span class="stat-label">完成任务</span>
+                            <span class="stat-value">8 个</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">平均时长</span>
+                            <span class="stat-value">45 分钟</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">四象限分布</span>
+                            <span class="stat-value">2/5/1/0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">获得 XP</span>
+                            <span class="stat-value">+152 XP</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="report-section">
+                    <div class="report-label">💡 关键发现</div>
+                    <div class="report-content">
+                        <p style="margin-bottom: 8px;">• 你上午完成了3个第二象限任务，效率最高</p>
+                        <p>• 本周第二象限任务占比提升15%</p>
+                    </div>
+                </div>
+
+                <div class="report-section">
+                    <div class="report-label">🎯 今日建议</div>
+                    <div class="report-content">
+                        <p style="margin-bottom: 8px;">• 适合安排一个90分钟的深度工作块</p>
+                        <p>• 今天可以处理2-3个第一象限任务</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="grid">
+            <!-- XP Trend -->
+            <div class="card">
+                <div class="card-title">
+                    <span>📈</span> XP 趋势图
+                </div>
+                <div class="chart-placeholder">
+                    [XP 趋势折线图]<br>使用 Chart.js 或类似库渲染
+                </div>
+            </div>
+
+            <!-- Quadrant Distribution -->
+            <div class="card">
+                <div class="card-title">
+                    <span>🎯</span> 四象限分布
+                </div>
+                <div class="quadrant-dist">
+                    <div class="quadrant-bar q1">
+                        🔥 Q1: 22%
+                    </div>
+                    <div class="quadrant-bar q2">
+                        🌱 Q2: 48%
+                    </div>
+                    <div class="quadrant-bar q3">
+                        ⚡ Q3: 20%
+                    </div>
+                    <div class="quadrant-bar q4">
+                        🎮 Q4: 10%
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attribute Radar -->
+            <div class="card">
+                <div class="card-title">
+                    <span>🎮</span> 属性雷达图
+                </div>
+                <div class="radar-chart">
+                    <div class="radar-bg"></div>
+                    <div class="radar-axis"></div>
+                    <div class="radar-axis"></div>
+                    <div class="radar-axis"></div>
+                    <div class="radar-axis"></div>
+                    <div class="radar-shape"></div>
+                    <div class="radar-label top">💪 力量</div>
+                    <div class="radar-label right">🧠 智慧</div>
+                    <div class="radar-label bottom">⚡ 敏捷</div>
+                    <div class="radar-label left">😊 魅力</div>
+                </div>
+                <div style="text-align: center; font-size: 12px; color: #6b7280; margin-top: 12px;">
+                    四项均衡，继续保持！
+                </div>
+            </div>
+
+            <!-- Achievement Progress -->
+            <div class="card">
+                <div class="card-title">
+                    <span>🏆</span> 成就进度
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-weight: 600; color: #374151;">已解锁: 15/200</span>
+                        <span style="color: #6b7280;">7.5%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 7.5%;"></div>
+                    </div>
+                </div>
+                <div style="margin-top: 16px;">
+                    <div style="font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 8px;">
+                        最近解锁
+                    </div>
+                    <div class="achievement-grid" style="grid-template-columns: repeat(3, 1fr);">
+                        <div class="achievement-item">
+                            <div class="achievement-icon">🏅</div>
+                            <div class="achievement-name">一周坚持</div>
+                        </div>
+                        <div class="achievement-item">
+                            <div class="achievement-icon">🏅</div>
+                            <div class="achievement-name">任务达人</div>
+                        </div>
+                        <div class="achievement-item">
+                            <div class="achievement-icon">🏅</div>
+                            <div class="achievement-name">效率新星</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Report -->
+        <div class="card">
+            <div class="card-title">
+                <span>📋</span> 周度报告 (2026-03-02 ~ 2026-03-08)
+            </div>
+
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">✅</div>
+                    <div class="metric-value">85%</div>
+                    <div class="metric-label">完成率</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">⏰</div>
+                    <div class="metric-value">92%</div>
+                    <div class="metric-label">准时率</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🎯</div>
+                    <div class="metric-value">78</div>
+                    <div class="metric-label">健康度</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 24px;">
+                <div class="report-label">⭐ 本周最佳时刻</div>
+                <div class="report-content">
+                    <p style="margin-bottom: 8px;">• 周三上午完成了5个重要任务</p>
+                    <p>• 连续7天完成了每日目标</p>
+                </div>
+            </div>
+
+            <div style="margin-top: 16px;">
+                <div class="report-label">🚀 改进机会</div>
+                <div class="report-content">
+                    <p style="margin-bottom: 8px;">• 可以尝试在早上9-11点处理重要任务</p>
+                    <p>• 第四象限任务较少，注意劳逸结合</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

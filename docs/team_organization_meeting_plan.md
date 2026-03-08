@@ -12,6 +12,7 @@
 | 版本 | 日期 | 修改人 | 修改内容 |
 |------|------|--------|----------|
 | v1.0 | 2026-03-06 | Sarah | 初始版本，基于产品设计讨论会总结 |
+| v1.1 | 2026-03-07 | Claude Code | 新增文档记录员角色 |
 
 ---
 
@@ -55,6 +56,7 @@
 │    │ • AI/数据: Dr. Emily, Kevin         │           │
 │    │ • 质量安全: Lisa, James, Dr. Williams│           │
 │    │ • 运维部署: Chris                   │           │
+│    │ • 文档记录: Jordan                  │           │
 │    └─────────────────────────────────────┘           │
 │                                                         │
 └─────────────────────────────────────────────────────────┘
@@ -411,17 +413,69 @@
 
 ---
 
+### 2.8 文档与知识管理团队
+
+#### 📝 文档记录员 (Document Recorder)
+
+**姓名**: Jordan Taylor
+
+**核心职责**:
+| 职责领域 | 具体工作 |
+|----------|----------|
+| 会议记录 | <ul><li>参加所有项目会议</li><li>记录会议纪要和讨论过程</li><li>总结会议结论和决策</li></ul> |
+| 会议文档生成 | <ul><li>生成结构化会议结论文档</li><li>明确下一步行动计划</li><li>记录决策理由和反对意见</li></ul> |
+| 参考资料管理 | <ul><li>收集和整理会议中引用的资料链接</li><li>维护参考资源文档 (reference_links.md)</li><li>确保资料可追溯和可访问</li></ul> |
+| 文档标准化 | <ul><li>使用统一的会议模板</li><li>确保文档格式规范</li><li>维护文档版本控制</li></ul> |
+
+**关键产出**:
+- 会议结论文档 (`docs/meetings/phase_XX_xxx/conclusion.md`)
+- 参考资源更新 (`docs/meetings/resources/references/reference_links.md`)
+- 讨论记录整理 (`docs/meetings/phase_XX_xxx/discussions/`)
+- 行动计划跟踪表
+
+**工作流程**:
+```
+会议前:
+1. 阅读会议议程，了解会议目标
+2. 准备会议模板文档
+3. 检查是否有需要更新的参考资料
+
+会议中:
+1. 实时记录关键讨论点
+2. 记录决策和决策理由
+3. 收集参会者提供的参考资料链接
+4. 明确下一步行动和负责人
+
+会议后:
+1. 整理会议纪要，生成结论文档
+2. 更新参考资源文档
+3. 发送会议纪要给全体参会者
+4. 跟踪行动项完成情况
+```
+
+**协作关系**:
+- ↔ 参加所有项目会议
+- ↔ 与主持人协同确认会议结论
+- ↔ 与各团队负责人协同收集参考资料
+- → 向 Alex 汇报文档状态
+
+**文档模板**: `docs/meetings/resources/templates/meeting_template.md`
+
+**资源管理**: `docs/meetings/resources/references/reference_links.md`
+
+---
+
 ## 3. 会议安排
 
 ### 3.1 系列会议总览
 
-| 会议 | 主题 | 主持人 | 参会人员 | 时长 | 产出 |
-|------|------|--------|----------|------|------|
-| **会议 1** | 技术架构与选型 | Alex | David, Michael, Kevin, Chris | 90 分钟 | 技术栈文档、架构图 |
-| **会议 2** | 前端设计与交互 | Sarah | Maya, David, Jessica | 60 分钟 | 界面原型、交互规范 |
-| **会议 3** | AI 提示词与数据 | Alex | Dr. Emily, Kevin, Ryan, Michael | 90 分钟 | 提示词方案、数据管道设计 |
-| **会议 4** | 测试与安全策略 | Lisa | James, Dr. Williams, Chris | 60 分钟 | 测试策略、安全合规方案 |
-| **会议 5** | 系统整合评审 | Alex | 全体参会人员 | 90 分钟 | 整合计划、风险清单 |
+| 会议 | 主题 | 主持人 | 参会人员 | 记录员 | 时长 | 产出 |
+|------|------|--------|----------|--------|------|------|
+| **会议 1** | 技术架构与选型 | Alex | David, Michael, Kevin, Chris | Jordan | 90 分钟 | 技术栈文档、架构图 |
+| **会议 2** | 前端设计与交互 | Sarah | Maya, David, Jessica | Jordan | 60 分钟 | 界面原型、交互规范 |
+| **会议 3** | AI 提示词与数据 | Alex | Dr. Emily, Kevin, Ryan, Michael | Jordan | 90 分钟 | 提示词方案、数据管道设计 |
+| **会议 4** | 测试与安全策略 | Lisa | James, Dr. Williams, Chris | Jordan | 60 分钟 | 测试策略、安全合规方案 |
+| **会议 5** | 系统整合评审 | Alex | 全体参会人员 | Jordan | 90 分钟 | 整合计划、风险清单 |
 
 ---
 
@@ -558,16 +612,18 @@
 
 | 决策/任务 | R (执行) | A (负责) | C (咨询) | I (告知) |
 |-----------|----------|----------|----------|----------|
-| 技术选型 | David, Michael | Alex | Chris, Lisa | Sarah |
-| AI 提示词设计 | Dr. Emily | Michael | Sarah, Dr. Williams | Alex |
-| 数据库设计 | Ryan | Michael | Kevin, David | Alex |
-| 前端架构 | Jessica | David | Maya | Sarah |
-| 安全合规 | James | Chris | Lisa | Alex |
-| 行为设计 | Dr. Williams | Sarah | Maya | Alex |
-| 测试策略 | Lisa | Lisa | All Engineers | Alex |
-| 产品优先级 | Sarah | Alex | All | All |
-| 部署方案 | Chris | Alex | Michael | All |
-| 文案审核 | Sarah | Dr. Williams | Maya | All |
+| 技术选型 | David, Michael | Alex | Chris, Lisa | Sarah, Jordan |
+| AI 提示词设计 | Dr. Emily | Michael | Sarah, Dr. Williams | Alex, Jordan |
+| 数据库设计 | Ryan | Michael | Kevin, David | Alex, Jordan |
+| 前端架构 | Jessica | David | Maya | Sarah, Jordan |
+| 安全合规 | James | Chris | Lisa | Alex, Jordan |
+| 行为设计 | Dr. Williams | Sarah | Maya | Alex, Jordan |
+| 测试策略 | Lisa | Lisa | All Engineers | Alex, Jordan |
+| 产品优先级 | Sarah | Alex | All | All, Jordan |
+| 部署方案 | Chris | Alex | Michael | All, Jordan |
+| 文案审核 | Sarah | Dr. Williams | Maya | All, Jordan |
+| 会议记录与文档 | Jordan | Jordan | All Meeting Participants | All |
+| 参考资料管理 | Jordan | Jordan | All Team Members | All |
 
 **图例**:
 - **R (Responsible)**: 实际执行任务的人
@@ -584,10 +640,10 @@
 | 会议 | 频率 | 参与者 | 时长 | 目的 |
 |------|------|--------|------|------|
 | 每日站会 | 每日 | 全体执行成员 | 15 分钟 | 同步进度、识别阻塞 |
-| 迭代计划会 | 每 2 周 | 全体 | 60 分钟 | 规划下迭代工作 |
-| 迭代回顾会 | 每 2 周 | 全体 | 45 分钟 | 反思改进 |
-| 技术评审会 | 按需 | 技术团队 | 60 分钟 | 技术方案评审 |
-| 产品评审会 | 按需 | 产品 + 设计 | 45 分钟 | 功能验收 |
+| 迭代计划会 | 每 2 周 | 全体 + Jordan | 60 分钟 | 规划下迭代工作 |
+| 迭代回顾会 | 每 2 周 | 全体 + Jordan | 45 分钟 | 反思改进 |
+| 技术评审会 | 按需 | 技术团队 + Jordan | 60 分钟 | 技术方案评审 |
+| 产品评审会 | 按需 | 产品 + 设计 + Jordan | 45 分钟 | 功能验收 |
 
 ### 5.2 沟通渠道
 
@@ -626,9 +682,10 @@
 | 需求文档 | `docs/requirements/` | Sarah |
 | 技术文档 | `docs/technical/` | Michael |
 | 设计稿 | Figma + `docs/design/` | Maya |
-| 会议纪要 | `docs/meetings/` | Alex |
+| 会议纪要 | `docs/meetings/` | Jordan |
 | 测试文档 | `docs/testing/` | Lisa |
 | 运维文档 | `docs/operations/` | Chris |
+| 参考资源 | `docs/meetings/resources/references/` | Jordan |
 
 ---
 
@@ -649,6 +706,7 @@
 | 产品经理 | Sarah Chen | sarah@example.com | @sarah |
 | 前端架构师 | David Kim | david@example.com | @david |
 | 后端架构师 | Michael Zhang | michael@example.com | @michael |
+| 文档记录员 | Jordan Taylor | jordan@example.com | @jordan |
 
 ---
 
@@ -656,4 +714,4 @@
 
 > 本团队组织文档为系统设计讨论会的基础，所有参会人员应在会前阅读此文档并准备相关材料。
 
-**下一次行动**: 召开"会议 1: 技术架构与选型"，由 Alex 主持，David、Michael、Kevin、Chris 参加。
+**下一次行动**: 召开"会议 1: 技术架构与选型"，由 Alex 主持，David、Michael、Kevin、Chris 参加，Jordan 负责会议记录。

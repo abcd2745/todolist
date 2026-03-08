@@ -1,0 +1,2256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏化待办系统 - 主页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header - 简约清新 */
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 14px 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 导航菜单 */
+        .nav-menu {
+            display: flex;
+            gap: 4px;
+            background: #f8fafc;
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .nav-item {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #64748b;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-item:hover {
+            background: white;
+            color: #475569;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-item.active {
+            background: white;
+            color: #64748b;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #475569;
+            transition: all 0.2s;
+        }
+
+        .stat-item:hover {
+            background: #e2e8f0;
+        }
+
+        .stat-item.xp {
+            background: #fef9c3;
+            color: #92400e;
+        }
+
+        .stat-item.level {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+
+        .stat-item.streak {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .user-menu {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .user-menu:hover {
+            background: #cbd5e1;
+        }
+
+        /* Quadrant Container - 坐标轴布局（更大） */
+        .quadrant-container {
+            background: white;
+            border-radius: 12px;
+            padding: 60px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            position: relative;
+            min-height: calc(100vh - 160px); /* 适应整个页面 */
+        }
+
+        /* Coordinate Axes - 渐变色线条 + 箭头 */
+        .axis {
+            position: absolute;
+        }
+
+        .axis-x {
+            width: calc(100% - 120px);
+            height: 3px;
+            left: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(to right,
+                #10b981 0%,   /* Q4 绿色 - 不紧急 */
+                #f59e0b 50%,  /* Q3 黄色 - 中间 */
+                #ef4444 100%  /* Q1 红色 - 紧急 */
+            );
+        }
+
+        /* X轴右箭头 */
+        .axis-x::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid #ef4444;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+        }
+
+        /* X轴左箭头 */
+        .axis-x::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-right: 10px solid #10b981;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+        }
+
+        .axis-y {
+            width: 3px;
+            height: calc(100% - 120px);
+            left: 50%;
+            top: 60px;
+            transform: translateX(-50%);
+            background: linear-gradient(to bottom,
+                #3b82f6 0%,   /* Q2 蓝色 - 重要 */
+                #f59e0b 50%,  /* Q3 黄色 - 中间 */
+                #f59e0b 100%  /* Q3/Q4 黄色 - 不重要 */
+            );
+        }
+
+        /* Y轴上箭头 */
+        .axis-y::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-bottom: 10px solid #3b82f6;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+        }
+
+        /* Y轴下箭头 */
+        .axis-y::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-top: 10px solid #f59e0b;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+        }
+
+        /* Axis Labels - 更大更清晰 */
+        .axis-label {
+            position: absolute;
+            font-size: 15px;
+            font-weight: 600;
+            color: #475569;
+            background: white;
+            padding: 6px 12px;
+        }
+
+        .axis-label.top {
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .axis-label.bottom {
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .axis-label.left {
+            left: 25px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+        }
+
+        .axis-label.right {
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%) rotate(90deg);
+        }
+
+        /* Quadrants */
+        .quadrant {
+            position: absolute;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .quadrant-header {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid;
+        }
+
+        /* Q1: 右上 - 紧急且重要 */
+        .quadrant.q1 {
+            top: 60px;
+            right: 60px;
+            width: calc(50% - 84px);
+            height: calc(50% - 84px);
+        }
+
+        .quadrant.q1 .quadrant-header {
+            color: #dc2626;
+            border-color: #fecaca;
+        }
+
+        /* Q2: 左上 - 重要不紧急 */
+        .quadrant.q2 {
+            top: 60px;
+            left: 60px;
+            width: calc(50% - 84px);
+            height: calc(50% - 84px);
+        }
+
+        .quadrant.q2 .quadrant-header {
+            color: #2563eb;
+            border-color: #bfdbfe;
+        }
+
+        /* Q3: 右下 - 紧急不重要 */
+        .quadrant.q3 {
+            bottom: 60px;
+            right: 60px;
+            width: calc(50% - 84px);
+            height: calc(50% - 84px);
+        }
+
+        .quadrant.q3 .quadrant-header {
+            color: #d97706;
+            border-color: #fde68a;
+        }
+
+        /* Q4: 左下 - 不紧急不重要 */
+        .quadrant.q4 {
+            bottom: 60px;
+            left: 60px;
+            width: calc(50% - 84px);
+            height: calc(50% - 84px);
+        }
+
+        .quadrant.q4 .quadrant-header {
+            color: #059669;
+            border-color: #a7f3d0;
+        }
+
+        /* Task Card - 优化按钮布局 */
+        .task-card {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 10px;
+            border-left: 3px solid;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .task-card.q1 { border-color: #ef4444; }
+        .task-card.q2 { border-color: #3b82f6; }
+        .task-card.q3 { border-color: #f59e0b; }
+        .task-card.q4 { border-color: #10b981; }
+
+        .task-card:hover {
+            background: #f1f5f9;
+            transform: translateX(2px);
+        }
+
+        /* 任务标题行：标题 + 操作按钮 */
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .task-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1e293b;
+            flex: 1;
+        }
+
+        /* 操作按钮组 - 小一点，右对齐 */
+        .task-actions {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .action-btn {
+            width: 24px;
+            height: 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            color: #94a3b8;
+        }
+
+        .action-btn:hover {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .action-btn.view:hover {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .action-btn.edit:hover {
+            background: #fef9c3;
+            color: #d97706;
+        }
+
+        .action-btn.delete:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .action-btn.complete:hover {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 8px;
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+
+        .task-xp {
+            display: inline-block;
+            background: #fef9c3;
+            color: #92400e;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .task-status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .task-status.pending { background: #fef3c7; color: #d97706; }
+        .task-status.in-progress { background: #dbeafe; color: #2563eb; }
+        .task-status.completed { background: #d1fae5; color: #059669; }
+
+        .btn-add {
+            width: 100%;
+            padding: 10px;
+            background: white;
+            color: #64748b;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+
+        .btn-add:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+            color: #475569;
+        }
+
+        /* Stars */
+        .stars {
+            color: #fbbf24;
+            letter-spacing: 1px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 28px;
+            max-width: 560px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .modal-close {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: #f1f5f9;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #64748b;
+        }
+
+        .modal-close:hover {
+            background: #e2e8f0;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #64748b;
+            box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .difficulty-selector {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .difficulty-option {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+        }
+
+        .difficulty-option:hover {
+            border-color: #cbd5e1;
+        }
+
+        .difficulty-option.active {
+            background: #f1f5f9;
+            border-color: #64748b;
+            color: #1e293b;
+        }
+
+        .quadrant-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .quadrant-option {
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+        }
+
+        .quadrant-option:hover {
+            background: #f8fafc;
+        }
+
+        .quadrant-option.active {
+            border-width: 2px;
+            background: #f8fafc;
+        }
+
+        .quadrant-option.q1.active { border-color: #ef4444; }
+        .quadrant-option.q2.active { border-color: #3b82f6; }
+        .quadrant-option.q3.active { border-color: #f59e0b; }
+        .quadrant-option.q4.active { border-color: #10b981; }
+
+        .xp-preview {
+            background: #fef9c3;
+            color: #92400e;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 600;
+            margin-top: 16px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .form-actions .btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 13px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .form-actions .btn-primary {
+            background: #64748b;
+            color: white;
+        }
+
+        .form-actions .btn-primary:hover {
+            background: #475569;
+        }
+
+        .form-actions .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .form-actions .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 10px;
+            padding: 14px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 2000;
+            animation: slideInRight 0.3s, fadeOut 0.3s 2.7s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .toast-icon {
+            font-size: 20px;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 500;
+            color: #1e293b;
+            margin-bottom: 2px;
+            font-size: 14px;
+        }
+
+        .toast-message {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .quadrant-container {
+                padding: 40px;
+                min-height: calc(100vh - 140px);
+            }
+
+            .axis-x {
+                width: calc(100% - 80px);
+                left: 40px;
+            }
+
+            .axis-y {
+                height: calc(100% - 80px);
+                top: 40px;
+            }
+
+            .quadrant.q1,
+            .quadrant.q2,
+            .quadrant.q3,
+            .quadrant.q4 {
+                width: calc(50% - 60px);
+                height: calc(50% - 60px);
+            }
+
+            .quadrant.q1, .quadrant.q2 {
+                top: 40px;
+            }
+
+            .quadrant.q3, .quadrant.q4 {
+                bottom: 40px;
+            }
+
+            .quadrant.q1, .quadrant.q3 {
+                right: 40px;
+            }
+
+            .quadrant.q2, .quadrant.q4 {
+                left: 40px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .header {
+                padding: 12px 16px;
+            }
+
+            .header-left {
+                width: 100%;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .nav-menu {
+                width: 100%;
+                justify-content: space-around;
+            }
+
+            .nav-item {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+            }
+
+            .stat-item {
+                font-size: 11px;
+                padding: 4px 8px;
+            }
+
+            .quadrant-container {
+                min-height: calc(100vh - 120px);
+            }
+
+            .quadrant-selector {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="logo">📋 任务管理</div>
+                <nav class="nav-menu">
+                    <a href="home.html" class="nav-item active">🏠 主页</a>
+                    <a href="analytics.html" class="nav-item">📊 数据分析</a>
+                    <a href="achievements.html" class="nav-item">🏆 成就殿堂</a>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="stat-item xp">💰 548 XP</div>
+                <div class="stat-item level">🏆 Lv.5</div>
+                <div class="stat-item streak">🔥 7天连击</div>
+                <div class="user-menu">👤</div>
+            </div>
+        </div>
+
+        <!-- Quadrant Container with Axes -->
+        <div class="quadrant-container">
+            <!-- Axis Labels -->
+            <div class="axis-label top">重要</div>
+            <div class="axis-label bottom">不重要</div>
+            <div class="axis-label left">不紧急</div>
+            <div class="axis-label right">紧急</div>
+
+            <!-- Coordinate Axes -->
+            <div class="axis axis-x"></div>
+            <div class="axis axis-y"></div>
+
+            <!-- Q1: 紧急且重要 (右上) -->
+            <div class="quadrant q1">
+                <div class="quadrant-header">
+                    <span>🔥</span> 紧急且重要
+                </div>
+
+                <div class="task-card q1">
+                    <div class="task-header">
+                        <div class="task-title">完成API设计</div>
+                        <div class="task-actions">
+                            <button class="action-btn complete" onclick="completeTask(this)" title="完成">✓</button>
+                            <button class="action-btn view" onclick="viewTask(this)" title="查看">👁</button>
+                            <button class="action-btn edit" onclick="editTask(this)" title="编辑">✎</button>
+                            <button class="action-btn delete" onclick="deleteTask(this)" title="删除">🗑</button>
+                        </div>
+                    </div>
+                    <div class="task-meta">
+                        <span>📅 03-10</span>
+                        <span class="stars">⭐⭐⭐⭐</span>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <span class="task-xp">+48 XP</span>
+                        <span class="task-status in-progress">进行中</span>
+                    </div>
+                </div>
+
+                <div class="task-card q1">
+                    <div class="task-header">
+                        <div class="task-title">回复重要邮件</div>
+                        <div class="task-actions">
+                            <button class="action-btn complete" onclick="completeTask(this)" title="完成">✓</button>
+                            <button class="action-btn view" onclick="viewTask(this)" title="查看">👁</button>
+                            <button class="action-btn edit" onclick="editTask(this)" title="编辑">✎</button>
+                            <button class="action-btn delete" onclick="deleteTask(this)" title="删除">🗑</button>
+                        </div>
+                    </div>
+                    <div class="task-meta">
+                        <span>📅 03-08</span>
+                        <span class="stars">⭐⭐</span>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <span class="task-xp">+24 XP</span>
+                        <span class="task-status pending">待办</span>
+                    </div>
+                </div>
+
+                <button class="btn-add" onclick="openModal(1)">+ 添加任务</button>
+            </div>
+
+            <!-- Q2: 重要不紧急 (左上) -->
+            <div class="quadrant q2">
+                <div class="quadrant-header">
+                    <span>🌱</span> 重要不紧急
+                </div>
+
+                <div class="task-card q2">
+                    <div class="task-header">
+                        <div class="task-title">学习Vue3新特性</div>
+                        <div class="task-actions">
+                            <button class="action-btn complete" onclick="completeTask(this)" title="完成">✓</button>
+                            <button class="action-btn view" onclick="viewTask(this)" title="查看">👁</button>
+                            <button class="action-btn edit" onclick="editTask(this)" title="编辑">✎</button>
+                            <button class="action-btn delete" onclick="deleteTask(this)" title="删除">🗑</button>
+                        </div>
+                    </div>
+                    <div class="task-meta">
+                        <span>📅 03-12</span>
+                        <span class="stars">⭐⭐⭐</span>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <span class="task-xp">+30 XP</span>
+                        <span class="task-status pending">待办</span>
+                    </div>
+                </div>
+
+                <div class="task-card q2">
+                    <div class="task-header">
+                        <div class="task-title">准备托福考试</div>
+                        <div class="task-actions">
+                            <button class="action-btn complete" onclick="completeTask(this)" title="完成">✓</button>
+                            <button class="action-btn view" onclick="viewTask(this)" title="查看">👁</button>
+                            <button class="action-btn edit" onclick="editTask(this)" title="编辑">✎</button>
+                            <button class="action-btn delete" onclick="deleteTask(this)" title="删除">🗑</button>
+                        </div>
+                    </div>
+                    <div class="task-meta">
+                        <span>📅 06-30</span>
+                        <span class="stars">⭐⭐⭐⭐⭐</span>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <span class="task-xp">+65 XP</span>
+                        <span class="task-status pending">待办</span>
+                    </div>
+                </div>
+
+                <button class="btn-add" onclick="openModal(2)">+ 添加任务</button>
+            </div>
+
+            <!-- Q3: 紧急不重要 (右下) -->
+            <div class="quadrant q3">
+                <div class="quadrant-header">
+                    <span>⚡</span> 紧急不重要
+                </div>
+
+                <div class="task-card q3">
+                    <div class="task-header">
+                        <div class="task-title">取快递</div>
+                        <div class="task-actions">
+                            <button class="action-btn complete" onclick="completeTask(this)" title="完成">✓</button>
+                            <button class="action-btn view" onclick="viewTask(this)" title="查看">👁</button>
+                            <button class="action-btn edit" onclick="editTask(this)" title="编辑">✎</button>
+                            <button class="action-btn delete" onclick="deleteTask(this)" title="删除">🗑</button>
+                        </div>
+                    </div>
+                    <div class="task-meta">
+                        <span>📅 03-08</span>
+                        <span class="stars">⭐</span>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <span class="task-xp">+11 XP</span>
+                        <span class="task-status pending">待办</span>
+                    </div>
+                </div>
+
+                <button class="btn-add" onclick="openModal(3)">+ 添加任务</button>
+            </div>
+
+            <!-- Q4: 不紧急不重要 (左下) -->
+            <div class="quadrant q4">
+                <div class="quadrant-header">
+                    <span>🎮</span> 不紧急不重要
+                </div>
+
+                <div class="task-card q4">
+                    <div class="task-header">
+                        <div class="task-title">看《三体》</div>
+                        <div class="task-actions">
+                            <button class="action-btn complete" onclick="completeTask(this)" title="完成">✓</button>
+                            <button class="action-btn view" onclick="viewTask(this)" title="查看">👁</button>
+                            <button class="action-btn edit" onclick="editTask(this)" title="编辑">✎</button>
+                            <button class="action-btn delete" onclick="deleteTask(this)" title="删除">🗑</button>
+                        </div>
+                    </div>
+                    <div class="task-meta">
+                        <span>📅 无期限</span>
+                        <span class="stars">⭐⭐</span>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <span class="task-xp">+11 XP</span>
+                        <span class="task-status pending">待办</span>
+                    </div>
+                </div>
+
+                <button class="btn-add" onclick="openModal(4)">+ 添加任务</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Task Modal -->
+    <div class="modal" id="viewModal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2 class="modal-title">📋 任务详情</h2>
+                <button class="modal-close" onclick="closeViewModal()">×</button>
+            </div>
+
+            <div id="viewContent">
+                <div style="margin-bottom: 16px;">
+                    <div style="font-size: 20px; font-weight: 600; color: #1e293b; margin-bottom: 8px;" id="viewTitle"></div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <span id="viewQuadrant" style="padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 500;"></span>
+                        <span id="viewStatus" style="padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 500;"></span>
+                    </div>
+                </div>
+
+                <!-- 父任务链接（如果是子任务） -->
+                <div id="viewParentTask" style="display: none; margin-bottom: 16px; padding: 12px; background: #fef9c3; border-radius: 8px; border-left: 3px solid #f59e0b;">
+                    <div style="font-size: 12px; color: #92400e; margin-bottom: 4px;">🔗 这是子任务，来源于</div>
+                    <a href="#" style="color: #d97706; font-weight: 600; text-decoration: none;" id="viewParentTaskLink">准备托福考试</a>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px;">
+                    <div style="padding: 12px; background: #f8fafc; border-radius: 8px;">
+                        <div style="font-size: 11px; color: #64748b; margin-bottom: 4px;">难度</div>
+                        <div id="viewDifficulty" style="font-size: 14px; font-weight: 600; color: #1e293b;"></div>
+                    </div>
+                    <div style="padding: 12px; background: #f8fafc; border-radius: 8px;">
+                        <div style="font-size: 11px; color: #64748b; margin-bottom: 4px;">XP 奖励</div>
+                        <div id="viewXP" style="font-size: 14px; font-weight: 600; color: #f59e0b;"></div>
+                    </div>
+                    <div style="padding: 12px; background: #f8fafc; border-radius: 8px;">
+                        <div style="font-size: 11px; color: #64748b; margin-bottom: 4px;">截止日期</div>
+                        <div id="viewDeadline" style="font-size: 14px; font-weight: 600; color: #1e293b;"></div>
+                    </div>
+                    <div style="padding: 12px; background: #f8fafc; border-radius: 8px;">
+                        <div style="font-size: 11px; color: #64748b; margin-bottom: 4px;">预估用时</div>
+                        <div id="viewDuration" style="font-size: 14px; font-weight: 600; color: #1e293b;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <div style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px;">🏷 标签</div>
+                    <div id="viewTags" style="display: flex; gap: 6px; flex-wrap: wrap;"></div>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <div style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px;">📝 任务描述</div>
+                    <div id="viewDescription" style="padding: 16px; background: #f8fafc; border-radius: 8px; color: #475569; line-height: 1.6;"></div>
+                </div>
+
+                <div>
+                    <div style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px;">📄 详细内容 (Markdown 预览)</div>
+                    <div id="viewMarkdown" style="padding: 20px; background: #f8fafc; border-radius: 8px; line-height: 1.8;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Task Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">✎ 编辑任务</h2>
+                <button class="modal-close" onclick="closeEditModal()">×</button>
+            </div>
+
+            <form id="editForm" onsubmit="saveEditTask(event)">
+                <div class="form-group">
+                    <label class="form-label">📋 任务标题 *</label>
+                    <input type="text" class="form-input" id="editTitle" required oninput="checkEditAIButtonStatus()">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">📝 任务描述</label>
+                    <textarea class="form-textarea" id="editDescription" oninput="checkEditAIButtonStatus()"></textarea>
+                    <button type="button" id="editAiAssistBtn" class="btn btn-primary" onclick="openEditAISplitModal()" style="margin-top: 8px; width: auto; padding: 8px 16px;" disabled title="请先填写任务标题和描述">
+                        🤖 AI 辅助
+                    </button>
+                    <div id="editAiAssistHint" style="font-size: 11px; color: #94a3b8; margin-top: 4px;">
+                        💡 填写任务标题和描述后可用
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">🎯 象限选择 *</label>
+                    <div class="quadrant-selector" id="editQuadrantSelector">
+                        <div class="quadrant-option q1" onclick="selectEditQuadrant(this, 1)">
+                            <div>🔥 紧急且重要</div>
+                        </div>
+                        <div class="quadrant-option q2" onclick="selectEditQuadrant(this, 2)">
+                            <div>🌱 重要不紧急</div>
+                        </div>
+                        <div class="quadrant-option q3" onclick="selectEditQuadrant(this, 3)">
+                            <div>⚡ 紧急不重要</div>
+                        </div>
+                        <div class="quadrant-option q4" onclick="selectEditQuadrant(this, 4)">
+                            <div>🎮 不紧急不重要</div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="editQuadrant" value="">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">⭐ 难度等级 *</label>
+                    <div class="difficulty-selector" id="editDifficultySelector">
+                        <div class="difficulty-option" onclick="selectEditDifficulty(this, 1)">⭐<br>很简单</div>
+                        <div class="difficulty-option" onclick="selectEditDifficulty(this, 2)">⭐⭐<br>简单</div>
+                        <div class="difficulty-option" onclick="selectEditDifficulty(this, 3)">⭐⭐⭐<br>中等</div>
+                        <div class="difficulty-option" onclick="selectEditDifficulty(this, 4)">⭐⭐⭐⭐<br>困难</div>
+                        <div class="difficulty-option" onclick="selectEditDifficulty(this, 5)">⭐⭐⭐⭐⭐<br>很困难</div>
+                    </div>
+                    <input type="hidden" id="editDifficulty" value="3">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">📅 截止日期</label>
+                    <input type="date" class="form-input" id="editDeadline">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">🏷 标签</label>
+                    <input type="text" class="form-input" id="editTags" placeholder="工作, 重要, API">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">⏱ 预估用时 (分钟)</label>
+                    <input type="number" class="form-input" id="editDuration" value="60">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">📄 详细内容 (Markdown)</label>
+                    <textarea class="form-textarea" id="editMarkdown" style="min-height: 150px; font-family: 'Courier New', monospace;" placeholder="# 任务标题&#10;&#10;## 背景&#10;描述背景..."></textarea>
+                </div>
+
+                <!-- 父任务链接（如果是子任务） -->
+                <div class="form-group" id="parentTaskLink" style="display: none;">
+                    <label class="form-label">🔗 父任务</label>
+                    <div style="padding: 12px; background: #f8fafc; border-radius: 8px; display: flex; align-items: center; gap: 8px;">
+                        <span style="color: #64748b;">📋</span>
+                        <a href="#" style="color: #3b82f6; text-decoration: none; font-weight: 500;" id="parentTaskLinkUrl">准备托福考试</a>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">💾 保存修改</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- AI Split Task Modal -->
+    <div class="modal" id="aiSplitModal" style="z-index: 2000;">
+        <div class="modal-content" style="max-width: 700px; max-height: 90vh; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <h2 class="modal-title">🤖 AI 任务助手</h2>
+                <button class="modal-close" onclick="closeAISplitModal()">×</button>
+            </div>
+
+            <!-- 对话历史 -->
+            <div id="aiChatHistory" style="flex: 1; overflow-y: auto; padding: 20px; min-height: 400px; max-height: 500px;">
+                <!-- AI 欢迎消息 -->
+                <div class="chat-message ai-message" style="display: flex; gap: 12px; margin-bottom: 16px;">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; flex-shrink: 0;">🤖</div>
+                    <div style="flex: 1;">
+                        <div style="padding: 14px 16px; background: #f8fafc; border-radius: 12px; color: #475569; line-height: 1.6; font-size: 14px;">
+                            你好！我是你的任务拆分助手。<br><br>
+                            我看到你想创建任务：<strong id="aiTaskTitle"></strong><br><br>
+                            为了帮你更好地拆分这个任务，你可以告诉我任何相关信息，比如：<br>
+                            • 📅 截止日期<br>
+                            • ⏰ 每天能投入的时间<br>
+                            • 📚 你的基础情况<br>
+                            • 💡 特别要求或关注点<br><br>
+                            或者直接说"开始拆分"，我会根据已有信息生成方案。
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 输入区域 -->
+            <div style="padding: 16px 20px; border-top: 1px solid #e2e8f0; background: white;">
+                <div style="display: flex; gap: 12px; align-items: flex-end;">
+                    <textarea id="aiUserInput"
+                              placeholder="输入你的问题或信息..."
+                              style="flex: 1; padding: 12px; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 14px; resize: none; min-height: 44px; max-height: 120px; font-family: inherit;"
+                              onkeydown="handleAIInputKeydown(event)"></textarea>
+                    <button onclick="sendAIMessage()" style="padding: 12px 20px; background: #3b82f6; color: white; border: none; border-radius: 12px; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap;">
+                        发送
+                    </button>
+                    <button onclick="requestAISplit()" style="padding: 12px 20px; background: #10b981; color: white; border: none; border-radius: 12px; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap;">
+                        ✨ 开始拆分
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="taskModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">创建新任务</h2>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+
+            <!-- 象限标识 -->
+            <div id="quadrantIndicator" style="margin-bottom: 20px; padding: 12px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                <span id="quadrantIcon">🌱</span>
+                <span id="quadrantText">重要不紧急</span>
+            </div>
+
+            <form id="taskForm" onsubmit="createTask(event)">
+                <div class="form-group">
+                    <label class="form-label">📋 任务标题 *</label>
+                    <input type="text" class="form-input" placeholder="输入任务标题..." required oninput="checkAIButtonStatus()">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">📝 任务描述</label>
+                    <textarea class="form-textarea" id="taskDescription" placeholder="简短描述任务内容..." oninput="checkAIButtonStatus()"></textarea>
+                    <button type="button" id="aiAssistBtn" class="btn btn-primary" onclick="openAISplitModal()" style="margin-top: 8px; width: auto; padding: 8px 16px;" disabled title="请先填写任务标题和描述">
+                        🤖 AI 辅助
+                    </button>
+                    <div id="aiAssistHint" style="font-size: 11px; color: #94a3b8; margin-top: 4px;">
+                        💡 填写任务标题和描述后可用
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">⭐ 难度等级 *</label>
+                    <div class="difficulty-selector">
+                        <div class="difficulty-option" onclick="selectDifficulty(this, 1)">⭐<br>很简单</div>
+                        <div class="difficulty-option" onclick="selectDifficulty(this, 2)">⭐⭐<br>简单</div>
+                        <div class="difficulty-option active" onclick="selectDifficulty(this, 3)">⭐⭐⭐<br>中等</div>
+                        <div class="difficulty-option" onclick="selectDifficulty(this, 4)">⭐⭐⭐⭐<br>困难</div>
+                        <div class="difficulty-option" onclick="selectDifficulty(this, 5)">⭐⭐⭐⭐⭐<br>很困难</div>
+                    </div>
+                    <input type="hidden" id="selectedDifficulty" value="3">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">📅 截止日期</label>
+                    <input type="date" class="form-input" id="deadline">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">🏷 标签</label>
+                    <input type="text" class="form-input" placeholder="输入标签，按回车添加...">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">⏱ 预估用时 (分钟)</label>
+                    <input type="number" class="form-input" placeholder="60" value="60">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">📄 详细内容 (Markdown)</label>
+                    <textarea class="form-textarea" id="taskMarkdown" style="min-height: 120px; font-family: 'Courier New', monospace;" placeholder="# 任务标题&#10;&#10;## 背景说明&#10;描述任务背景...&#10;&#10;## 行动计划&#10;1. 第一步&#10;2. 第二步&#10;&#10;## Checklist&#10;- [ ] 待办项1&#10;- [ ] 待办项2"></textarea>
+                </div>
+
+                <div class="xp-preview">
+                    💰 预计获得 XP: 48 XP
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">✨ 创建任务</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 示例任务数据（包含长期任务）
+        const tasksData = [
+            {
+                id: 1,
+                title: '准备托福考试',
+                quadrant: 2,
+                difficulty: 5,
+                deadline: '2026-06-30',
+                xp: 65,
+                status: 'pending',
+                tags: ['学习', '重要', '长期'],
+                description: '为期3个月的托福备考计划',
+                markdown: '# 托福备考计划\n\n## 目标\n- 总分100+\n- 口语23+\n\n## 计划\n### 第1月：基础\n- 单词背诵\n- 听力训练\n\n### 第2月：强化\n- 真题练习\n- 写作模板\n\n### 第3月：冲刺\n- 模拟考试\n- 弱项突破'
+            },
+            {
+                id: 2,
+                title: '学习Vue3新特性',
+                quadrant: 2,
+                difficulty: 3,
+                deadline: '2026-03-12',
+                xp: 30,
+                status: 'pending',
+                tags: ['学习', '技术'],
+                description: '学习Vue3 Composition API',
+                markdown: '# Vue3学习计划\n\n## 学习内容\n- Composition API\n- <script setup>\n- 响应式原理'
+            },
+            {
+                id: 3,
+                title: '完成API设计',
+                quadrant: 1,
+                difficulty: 4,
+                deadline: '2026-03-10',
+                xp: 48,
+                status: 'in-progress',
+                tags: ['工作', 'API', '重要'],
+                description: '设计RESTful API接口',
+                markdown: '# API设计任务\n\n## 背景说明\n游戏化待办系统需要完整的API支持。\n\n## 行动计划\n1. 定义API规范 ✓\n2. 设计数据结构\n3. 编写API文档'
+            },
+            {
+                id: 4,
+                title: '回复重要邮件',
+                quadrant: 1,
+                difficulty: 2,
+                deadline: '2026-03-08',
+                xp: 24,
+                status: 'pending',
+                tags: ['工作', '紧急'],
+                description: '回复客户的重要邮件',
+                markdown: '# 邮件回复\n\n需要回复的内容...'
+            },
+            {
+                id: 5,
+                title: '取快递',
+                quadrant: 3,
+                difficulty: 1,
+                deadline: '2026-03-08',
+                xp: 11,
+                status: 'pending',
+                tags: ['生活'],
+                description: '去快递站取快递',
+                markdown: ''
+            },
+            {
+                id: 6,
+                title: '看《三体》',
+                quadrant: 4,
+                difficulty: 2,
+                deadline: null,
+                xp: 11,
+                status: 'pending',
+                tags: ['娱乐', '阅读'],
+                description: '阅读《三体》小说',
+                markdown: ''
+            }
+        ];
+
+        // 获取今天的日期
+        function getToday() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        // 检查任务是否应该显示（长期任务每天都要显示）
+        function shouldShowTask(task) {
+            if (task.status === 'completed') return false;
+
+            const today = getToday();
+
+            // 没有截止日期的任务始终显示
+            if (!task.deadline) return true;
+
+            // 已过期的任务不显示（或可以标记为逾期）
+            if (task.deadline < today) return false;
+
+            // 截止日期在今天之后的任务都要显示（包括长期任务）
+            return true;
+        }
+
+        // 计算剩余天数
+        function getDaysRemaining(deadline) {
+            if (!deadline) return null;
+
+            const today = new Date(getToday());
+            const deadlineDate = new Date(deadline);
+            const diffTime = deadlineDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            return diffDays;
+        }
+
+        // 格式化截止日期显示
+        function formatDeadline(deadline) {
+            if (!deadline) return '📅 无期限';
+
+            const days = getDaysRemaining(deadline);
+            const dateStr = new Date(deadline).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
+
+            if (days === null) return `📅 ${dateStr}`;
+            if (days < 0) return `📅 已逾期 ${Math.abs(days)} 天`;
+            if (days === 0) return `📅 今天截止`;
+            if (days === 1) return `📅 明天截止`;
+            if (days <= 7) return `📅 ${dateStr} (${days}天后)`;
+            if (days <= 30) return `📅 ${dateStr} (${Math.ceil(days/7)}周后)`;
+            if (days <= 365) return `📅 ${dateStr} (${Math.ceil(days/30)}个月后)`;
+
+            return `📅 ${dateStr} (${Math.ceil(days/365)}年后)`;
+        }
+
+        // Modal functions
+        let currentQuadrant = 2; // 记录当前选择的象限
+
+        function openModal(quadrant = 2) {
+            currentQuadrant = quadrant;
+
+            // 更新象限标识
+            updateQuadrantIndicator(quadrant);
+
+            document.getElementById('taskModal').classList.add('active');
+
+            // 设置截止日期最小值为今天
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('deadline').min = today;
+
+            // 更新 XP 预览
+            updateXPPreview();
+        }
+
+        function updateQuadrantIndicator(quadrant) {
+            const indicator = document.getElementById('quadrantIndicator');
+            const icon = document.getElementById('quadrantIcon');
+            const text = document.getElementById('quadrantText');
+
+            const quadrantInfo = {
+                1: { icon: '🔥', text: '紧急且重要', color: '#dc2626', bg: '#fee2e2' },
+                2: { icon: '🌱', text: '重要不紧急', color: '#2563eb', bg: '#dbeafe' },
+                3: { icon: '⚡', text: '紧急不重要', color: '#d97706', bg: '#fef3c7' },
+                4: { icon: '🎮', text: '不紧急不重要', color: '#059669', bg: '#d1fae5' }
+            };
+
+            const info = quadrantInfo[quadrant];
+            icon.textContent = info.icon;
+            text.textContent = info.text;
+            indicator.style.background = info.bg;
+            indicator.style.color = info.color;
+        }
+
+        function closeModal() {
+            document.getElementById('taskModal').classList.remove('active');
+        }
+
+        // Quadrant selection
+        function selectQuadrant(element, quadrant) {
+            document.querySelectorAll('.quadrant-option').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            document.getElementById('selectedQuadrant').value = quadrant;
+            updateXPPreview();
+        }
+
+        // Difficulty selection
+        function selectDifficulty(element, difficulty) {
+            document.querySelectorAll('.difficulty-option').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            document.getElementById('selectedDifficulty').value = difficulty;
+            updateXPPreview();
+        }
+
+        // Update XP preview
+        function updateXPPreview() {
+            const difficulty = parseInt(document.getElementById('selectedDifficulty').value) || 3;
+            const quadrant = currentQuadrant;
+
+            const baseXP = difficulty * 10;
+            const quadrantBonus = {
+                1: 0.20,
+                2: 0.30,
+                3: 0.10,
+                4: 0.05
+            };
+
+            const totalXP = Math.round(baseXP * (1 + quadrantBonus[quadrant]));
+            document.querySelector('.xp-preview').textContent = `💰 预计获得 XP: ${totalXP} XP`;
+        }
+
+        // Create task
+        function createTask(event) {
+            event.preventDefault();
+
+            // 获取表单数据
+            const form = event.target;
+            const title = form.querySelector('input[type="text"]').value;
+            const description = document.getElementById('taskDescription').value;
+            const quadrant = currentQuadrant; // 使用当前象限
+            const difficulty = parseInt(document.getElementById('selectedDifficulty').value) || 3;
+            const deadline = document.getElementById('deadline').value;
+            const tags = form.querySelectorAll('.form-input')[4].value;
+            const duration = document.getElementById('taskDuration').value;
+            const markdown = document.getElementById('taskMarkdown').value;
+
+            // 计算 XP
+            const baseXP = difficulty * 10;
+            const quadrantBonus = { 1: 0.20, 2: 0.30, 3: 0.10, 4: 0.05 };
+            const xp = Math.round(baseXP * (1 + quadrantBonus[quadrant]));
+
+            // 创建任务卡片 HTML
+            const taskCard = createTaskCardHTML(title, quadrant, difficulty, deadline, xp, markdown);
+
+            // 添加到对应的象限
+            const quadrantDiv = document.querySelector(`.quadrant.q${quadrant}`);
+            const addButton = quadrantDiv.querySelector('.btn-add');
+            addButton.insertAdjacentHTML('beforebegin', taskCard);
+
+            // 关闭弹窗并清空表单
+            closeModal();
+            form.reset();
+
+            // 显示成功提示
+            showToast('✅ 任务创建成功', `新任务已添加到${getQuadrantName(quadrant)}`);
+        }
+
+        function getQuadrantName(quadrant) {
+            const names = {
+                1: '紧急且重要',
+                2: '重要不紧急',
+                3: '紧急不重要',
+                4: '不紧急不重要'
+            };
+            return names[quadrant] || '';
+        }
+
+        function createTaskCardHTML(title, quadrant, difficulty, deadline, xp, markdown) {
+            const stars = '⭐'.repeat(difficulty);
+            const deadlineText = deadline ? formatDate(deadline) : '📅 无期限';
+            const isLongTerm = deadline && getDaysRemaining(deadline) > 30;
+
+            return `
+                <div class="task-card q${quadrant}" style="border-left-width: ${isLongTerm ? '4px' : '3px'};">
+                    <div class="task-header">
+                        <div class="task-title">${title}${isLongTerm ? ' <span style="font-size: 10px; color: #d97706; margin-left: 6px;">📅 长期任务</span>' : ''}</div>
+                        <div class="task-actions">
+                            <button class="action-btn complete" onclick="completeTask(this)" title="完成">✓</button>
+                            <button class="action-btn view" onclick="viewTask(this)" title="查看">👁</button>
+                            <button class="action-btn edit" onclick="editTask(this)" title="编辑">✎</button>
+                            <button class="action-btn delete" onclick="deleteTask(this)" title="删除">🗑</button>
+                        </div>
+                    </div>
+                    <div class="task-meta">
+                        <span>${deadlineText}</span>
+                        <span class="stars">${stars}</span>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <span class="task-xp">+${xp} XP</span>
+                        <span class="task-status pending">待办</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function formatDate(deadline) {
+            const today = getToday();
+            const days = getDaysRemaining(deadline);
+            const dateStr = new Date(deadline).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
+
+            if (days === 0) return '📅 今天截止';
+            if (days === 1) return '📅 明天截止';
+            if (days <= 7) return `📅 ${dateStr} (${days}天后)`;
+            if (days <= 30) return `📅 ${dateStr} (${Math.ceil(days/7)}周后)`;
+            if (days <= 365) return `📅 ${dateStr} (${Math.ceil(days/30)}个月后)`;
+
+            return `📅 ${dateStr}`;
+        }
+
+        // Complete task with animation
+        function completeTask(button) {
+            const card = button.closest('.task-card');
+
+            card.style.transform = 'scale(0.95)';
+            card.style.opacity = '0.5';
+
+            setTimeout(() => {
+                const xp = card.querySelector('.task-xp').textContent;
+                const xpValue = parseInt(xp.match(/\d+/)[0]);
+
+                const headerXP = document.querySelector('.stat-item.xp');
+                const currentXP = parseInt(headerXP.textContent.match(/\d+/)[0]);
+                headerXP.textContent = `💰 ${currentXP + xpValue} XP`;
+
+                showToast('✅ 任务完成', `恭喜获得 ${xpValue} XP！`);
+
+                card.style.transform = 'scale(0)';
+                card.style.opacity = '0';
+                setTimeout(() => card.remove(), 200);
+            }, 200);
+        }
+
+        // Markdown 渲染函数（简单实现）
+        function renderMarkdown(markdown) {
+            if (!markdown) return '<p style="color: #94a3b8; font-style: italic;">暂无详细内容</p>';
+
+            let html = markdown;
+
+            // 标题
+            html = html.replace(/^### (.*$)/gim, '<h3 style="font-size: 16px; font-weight: 600; color: #1e293b; margin: 16px 0 8px 0;">$1</h3>');
+            html = html.replace(/^## (.*$)/gim, '<h2 style="font-size: 18px; font-weight: 600; color: #1e293b; margin: 20px 0 10px 0; padding-bottom: 6px; border-bottom: 1px solid #e2e8f0;">$1</h2>');
+            html = html.replace(/^# (.*$)/gim, '<h1 style="font-size: 22px; font-weight: 600; color: #1e293b; margin: 20px 0 12px 0;">$1</h1>');
+
+            // 粗体
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong style="font-weight: 600;">$1</strong>');
+
+            // 斜体
+            html = html.replace(/\*(.*?)\*/g, '<em style="font-style: italic;">$1</em>');
+
+            // 代码块
+            html = html.replace(/```([\s\S]*?)```/g, '<pre style="background: #1e293b; color: #e2e8f0; padding: 12px; border-radius: 6px; overflow-x: auto; margin: 12px 0; font-family: \'Courier New\', monospace; font-size: 13px;">$1</pre>');
+
+            // 行内代码
+            html = html.replace(/`(.*?)`/g, '<code style="background: #e2e8f0; color: #dc2626; padding: 2px 6px; border-radius: 4px; font-family: \'Courier New\', monospace; font-size: 12px;">$1</code>');
+
+            // Checklist
+            html = html.replace(/^- \[x\] (.*)$/gim, '<div style="margin: 6px 0;"><label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #64748b; text-decoration: line-through;"><input type="checkbox" checked disabled style="width: 16px; height: 16px;">$1</label></div>');
+            html = html.replace(/^- \[ \] (.*)$/gim, '<div style="margin: 6px 0;"><label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #475569;"><input type="checkbox" disabled style="width: 16px; height: 16px;">$1</label></div>');
+
+            // 无序列表
+            html = html.replace(/^- (.*)$/gim, '<li style="margin: 6px 0 6px 24px; color: #475569; position: relative;">$1</li>');
+
+            // 有序列表
+            html = html.replace(/^\d+\. (.*)$/gim, '<li style="margin: 6px 0 6px 24px; color: #475569; list-style-type: decimal;">$1</li>');
+
+            // 分隔线
+            html = html.replace(/^---$/gim, '<hr style="border: none; border-top: 2px solid #e2e8f0; margin: 16px 0;">');
+
+            // 段落
+            html = html.replace(/\n\n/g, '</p><p style="margin: 12px 0; color: #475569;">');
+            html = '<p style="margin: 12px 0; color: #475569;">' + html + '</p>';
+
+            // 清理空段落
+            html = html.replace(/<p style="[^"]*"><\/p>/g, '');
+
+            return html;
+        }
+
+        // View task
+        function viewTask(button) {
+            const card = button.closest('.task-card');
+            const title = card.querySelector('.task-title').textContent;
+            const meta = card.querySelector('.task-meta').textContent;
+            const xp = card.querySelector('.task-xp').textContent;
+            const status = card.querySelector('.task-status').textContent;
+            const quadrant = card.className.includes('q1') ? 1 :
+                           card.className.includes('q2') ? 2 :
+                           card.className.includes('q3') ? 3 : 4;
+
+            // 填充查看弹窗数据
+            document.getElementById('viewTitle').textContent = title;
+            document.getElementById('viewXP').textContent = xp;
+
+            // 设置象限
+            const quadrantNames = {
+                1: { name: '紧急且重要', color: '#fee2e2', textColor: '#dc2626' },
+                2: { name: '重要不紧急', color: '#dbeafe', textColor: '#2563eb' },
+                3: { name: '紧急不重要', color: '#fef3c7', textColor: '#d97706' },
+                4: { name: '不紧急不重要', color: '#d1fae5', textColor: '#059669' }
+            };
+            const q = quadrantNames[quadrant];
+            document.getElementById('viewQuadrant').textContent = q.name;
+            document.getElementById('viewQuadrant').style.background = q.color;
+            document.getElementById('viewQuadrant').style.color = q.textColor;
+
+            // 设置状态
+            const statusColors = {
+                '待办': { bg: '#fef3c7', color: '#d97706' },
+                '进行中': { bg: '#dbeafe', color: '#2563eb' },
+                '已完成': { bg: '#d1fae5', color: '#059669' }
+            };
+            const s = statusColors[status] || { bg: '#f1f5f9', color: '#64748b' };
+            document.getElementById('viewStatus').textContent = status;
+            document.getElementById('viewStatus').style.background = s.bg;
+            document.getElementById('viewStatus').style.color = s.color;
+
+            // 解析meta数据
+            const parts = meta.split(/\s+/);
+            let deadline = '', difficulty = '';
+            parts.forEach(part => {
+                if (part.startsWith('📅')) deadline = part.replace('📅', '').trim();
+                if (part.includes('⭐')) difficulty = part;
+            });
+
+            document.getElementById('viewDifficulty').textContent = difficulty || '⭐⭐⭐';
+            document.getElementById('viewDeadline').textContent = deadline || '未设置';
+            document.getElementById('viewDuration').textContent = '120 分钟';
+
+            // 标签
+            const tagsHtml = ['工作', '重要'].map(tag =>
+                `<span style="padding: 4px 10px; background: #f1f5f9; border-radius: 6px; font-size: 12px; font-weight: 500; color: #475569;">🏷 ${tag}</span>`
+            ).join('');
+            document.getElementById('viewTags').innerHTML = tagsHtml;
+
+            // 描述
+            document.getElementById('viewDescription').textContent = `这是"${title}"的详细描述信息。需要完成相关的工作内容和任务目标。`;
+
+            // Markdown 内容 - 渲染预览
+            const markdownContent = `# ${title}
+
+## 背景说明
+这是任务的背景和上下文信息。
+
+## 行动计划
+1. 第一阶段：需求分析 ✓
+2. 第二阶段：设计开发
+3. 第三阶段：测试上线
+
+## Checklist
+- [x] 需求确认
+- [x] 方案设计
+- [ ] 编码实现
+- [ ] 测试验证`;
+
+            document.getElementById('viewMarkdown').innerHTML = renderMarkdown(markdownContent);
+
+            // 打开查看弹窗
+            document.getElementById('viewModal').classList.add('active');
+        }
+
+        function closeViewModal() {
+            document.getElementById('viewModal').classList.remove('active');
+        }
+
+        // Edit task
+        function editTask(button) {
+            const card = button.closest('.task-card');
+            const title = card.querySelector('.task-title').textContent;
+            const quadrant = card.className.includes('q1') ? 1 :
+                           card.className.includes('q2') ? 2 :
+                           card.className.includes('q3') ? 3 : 4;
+
+            // 填充编辑表单
+            document.getElementById('editTitle').value = title;
+            document.getElementById('editDescription').value = `这是"${title}"的描述`;
+
+            // 设置象限
+            selectEditQuadrant(document.querySelector(`#editQuadrantSelector .quadrant-option.q${quadrant}`), quadrant);
+
+            // 设置难度（示例）
+            selectEditDifficulty(document.querySelector('#editDifficultySelector .difficulty-option:nth-child(3)'), 3);
+
+            // 设置其他字段
+            document.getElementById('editDeadline').value = '2026-03-15';
+            document.getElementById('editTags').value = '工作, 重要';
+            document.getElementById('editDuration').value = '120';
+            document.getElementById('editMarkdown').value = `# ${title}\n\n## 背景\n任务背景信息...\n\n## 行动计划\n1. 需求分析\n2. 设计开发\n3. 测试上线`;
+
+            // 设置截止日期最小值为今天
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('editDeadline').min = today;
+
+            // 打开编辑弹窗
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        function selectEditQuadrant(element, quadrant) {
+            document.querySelectorAll('#editQuadrantSelector .quadrant-option').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            document.getElementById('editQuadrant').value = quadrant;
+        }
+
+        function selectEditDifficulty(element, difficulty) {
+            document.querySelectorAll('#editDifficultySelector .difficulty-option').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            document.getElementById('editDifficulty').value = difficulty;
+        }
+
+        function saveEditTask(event) {
+            event.preventDefault();
+            closeEditModal();
+            showToast('✅ 修改已保存', '任务信息已更新');
+        }
+
+        // AI Split Task functions
+        let currentAITarget = 'create'; // 'create' or 'edit'
+
+        // 检查新建任务的AI按钮状态
+        function checkAIButtonStatus() {
+            const titleInput = document.querySelector('#taskForm input[type="text"]');
+            const descriptionInput = document.getElementById('taskDescription');
+            const aiBtn = document.getElementById('aiAssistBtn');
+            const hint = document.getElementById('aiAssistHint');
+
+            const hasTitle = titleInput && titleInput.value.trim().length > 0;
+            const hasDescription = descriptionInput && descriptionInput.value.trim().length > 0;
+
+            if (hasTitle && hasDescription) {
+                aiBtn.disabled = false;
+                aiBtn.title = '使用 AI 辅助拆分任务';
+                hint.style.display = 'none';
+            } else {
+                aiBtn.disabled = true;
+                aiBtn.title = '请先填写任务标题和描述';
+                hint.style.display = 'block';
+            }
+        }
+
+        // 检查编辑任务的AI按钮状态
+        function checkEditAIButtonStatus() {
+            const titleInput = document.getElementById('editTitle');
+            const descriptionInput = document.getElementById('editDescription');
+            const aiBtn = document.getElementById('editAiAssistBtn');
+            const hint = document.getElementById('editAiAssistHint');
+
+            const hasTitle = titleInput && titleInput.value.trim().length > 0;
+            const hasDescription = descriptionInput && descriptionInput.value.trim().length > 0;
+
+            if (hasTitle && hasDescription) {
+                aiBtn.disabled = false;
+                aiBtn.title = '使用 AI 辅助拆分任务';
+                hint.style.display = 'none';
+            } else {
+                aiBtn.disabled = true;
+                aiBtn.title = '请先填写任务标题和描述';
+                hint.style.display = 'block';
+            }
+        }
+
+        function openAISplitModal() {
+            currentAITarget = 'create';
+
+            // 带出任务标题和描述到弹出框
+            const titleInput = document.querySelector('#taskForm input[type="text"]');
+            const descriptionInput = document.getElementById('taskDescription');
+
+            const title = titleInput ? titleInput.value : '';
+            const description = descriptionInput ? descriptionInput.value : '';
+
+            // 显示任务标题
+            document.getElementById('aiTaskTitle').textContent = title;
+
+            // 重置对话历史（保留欢迎消息）
+            resetAIChat();
+
+            document.getElementById('aiSplitModal').classList.add('active');
+
+            // 如果有描述，自动发送第一条消息
+            if (description) {
+                setTimeout(() => {
+                    document.getElementById('aiUserInput').value = description;
+                    sendAIMessage();
+                }, 500);
+            }
+        }
+
+        function openEditAISplitModal() {
+            currentAITarget = 'edit';
+
+            // 带出编辑表单的数据
+            const editTitle = document.getElementById('editTitle').value;
+            const editDescription = document.getElementById('editDescription').value;
+
+            // 显示任务标题
+            document.getElementById('aiTaskTitle').textContent = editTitle;
+
+            // 重置对话历史
+            resetAIChat();
+
+            document.getElementById('aiSplitModal').classList.add('active');
+
+            // 如果有描述，自动发送第一条消息
+            if (editDescription) {
+                setTimeout(() => {
+                    document.getElementById('aiUserInput').value = editDescription;
+                    sendAIMessage();
+                }, 500);
+            }
+        }
+
+        function closeAISplitModal() {
+            document.getElementById('aiSplitModal').classList.remove('active');
+        }
+
+        function handleAIInputKeydown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendAIMessage();
+            }
+        }
+
+        // 存储对话上下文
+        let aiChatContext = {
+            deadline: null,
+            dailyTime: null,
+            background: null,
+            special: null,
+            splitStyle: 'balanced'
+        };
+
+        function sendAIMessage() {
+            const input = document.getElementById('aiUserInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // 添加用户消息
+            addUserMessage(message);
+
+            // 清空输入框
+            input.value = '';
+
+            // 解析用户消息，提取信息
+            parseUserMessage(message);
+
+            // 生成 AI 回复
+            setTimeout(() => {
+                const aiReply = generateAIReply(message);
+                addAIMessage(aiReply);
+            }, 500);
+        }
+
+        function parseUserMessage(message) {
+            const lowerMsg = message.toLowerCase();
+
+            // 尝试提取截止日期
+            if (lowerMsg.includes('截止') || lowerMsg.includes('日期') || lowerMsg.includes('deadline')) {
+                const dateMatch = message.match(/\d{4}[-/年]\d{1,2}[-/月]\d{1,2}/);
+                if (dateMatch) {
+                    aiChatContext.deadline = dateMatch[0].replace(/[年月]/g, '-').replace(/\//g, '-');
+                }
+            }
+
+            // 尝试提取每日时间
+            if (lowerMsg.includes('每天') || lowerMsg.includes('每日') || lowerMsg.includes('小时') || lowerMsg.includes('分钟')) {
+                const hourMatch = message.match(/(\d+)\s*小时/);
+                const minMatch = message.match(/(\d+)\s*分钟/);
+                if (hourMatch) {
+                    aiChatContext.dailyTime = parseInt(hourMatch[1]) * 60;
+                } else if (minMatch) {
+                    aiChatContext.dailyTime = parseInt(minMatch[1]);
+                }
+            }
+
+            // 尝试提取基础信息
+            if (lowerMsg.includes('基础') || lowerMsg.includes('经验') || lowerMsg.includes('学过')) {
+                if (!aiChatContext.background) {
+                    aiChatContext.background = message;
+                }
+            }
+
+            // 尝试提取特别要求
+            if (lowerMsg.includes('重点') || lowerMsg.includes('特别') || lowerMsg.includes('关注') || lowerMsg.includes('要求')) {
+                if (!aiChatContext.special) {
+                    aiChatContext.special = message;
+                }
+            }
+
+            // 检测拆分风格
+            if (lowerMsg.includes('渐进') || lowerMsg.includes('从易到难')) {
+                aiChatContext.splitStyle = 'intensive';
+            }
+            if (lowerMsg.includes('平衡') || lowerMsg.includes('均衡')) {
+                aiChatContext.splitStyle = 'balanced';
+            }
+        }
+
+        function generateAIReply(userMessage) {
+            const lowerMsg = userMessage.toLowerCase();
+
+            // 根据用户消息生成回复
+            if (lowerMsg.includes('截止') || lowerMsg.includes('日期')) {
+                return `好的，我记下了截止日期信息。还有其他需要补充的吗？比如每天能投入多少时间？`;
+            }
+
+            if (lowerMsg.includes('小时') || lowerMsg.includes('分钟') || lowerMsg.includes('时间')) {
+                return `了解！每天的时间安排很重要。你现在的学习基础如何？或者有什么特别想要关注的点？`;
+            }
+
+            if (lowerMsg.includes('基础') || lowerMsg.includes('经验') || lowerMsg.includes('学过')) {
+                return `很好！这些信息对我很有帮助。还有其他需要告诉我的吗？或者直接点击"开始拆分"生成方案。`;
+            }
+
+            if (lowerMsg.includes('重点') || lowerMsg.includes('特别') || lowerMsg.includes('关注')) {
+                return `收到！我会特别注意这一点。你觉得还有其他需要补充的信息吗？`;
+            }
+
+            // 默认回复
+            return `好的，我了解了。你可以继续告诉我更多细节，或者直接点击"开始拆分"让我为你生成任务拆分方案。`;
+        }
+
+        function addUserMessage(message) {
+            const chatHistory = document.getElementById('aiChatHistory');
+
+            const userMsgDiv = document.createElement('div');
+            userMsgDiv.className = 'chat-message user-message';
+            userMsgDiv.style.cssText = 'display: flex; gap: 12px; margin-bottom: 16px; justify-content: flex-end;';
+            userMsgDiv.innerHTML = `
+                <div style="flex: 1; text-align: right;">
+                    <div style="display: inline-block; padding: 14px 16px; background: #3b82f6; border-radius: 12px; color: white; line-height: 1.6; font-size: 14px; text-align: left; max-width: 80%;">
+                        ${escapeHtml(message)}
+                    </div>
+                </div>
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #64748b; font-size: 18px; flex-shrink: 0;">👤</div>
+            `;
+
+            chatHistory.appendChild(userMsgDiv);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        function addAIMessage(message) {
+            const chatHistory = document.getElementById('aiChatHistory');
+
+            const aiMsgDiv = document.createElement('div');
+            aiMsgDiv.className = 'chat-message ai-message';
+            aiMsgDiv.style.cssText = 'display: flex; gap: 12px; margin-bottom: 16px;';
+            aiMsgDiv.innerHTML = `
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; flex-shrink: 0;">🤖</div>
+                <div style="flex: 1;">
+                    <div style="padding: 14px 16px; background: #f8fafc; border-radius: 12px; color: #475569; line-height: 1.6; font-size: 14px;">
+                        ${message}
+                    </div>
+                </div>
+            `;
+
+            chatHistory.appendChild(aiMsgDiv);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function requestAISplit() {
+            const goal = document.getElementById('aiTaskTitle').textContent;
+            const { deadline, dailyTime, background, special, splitStyle } = aiChatContext;
+
+            // 添加用户请求消息
+            addUserMessage('开始拆分任务吧！');
+
+            // AI 思考中
+            setTimeout(() => {
+                addAIMessage('好的，让我根据我们讨论的信息来生成拆分方案...');
+
+                setTimeout(() => {
+                    // 生成 Markdown
+                    const markdown = generateTaskSplit(
+                        goal,
+                        deadline || '',
+                        dailyTime || 60,
+                        background || '',
+                        special || '',
+                        splitStyle
+                    );
+
+                    // AI 完成消息
+                    const completeMsg = `✅ 拆分方案已生成！我已经将详细的行动计划填充到"详细内容"字段中。
+
+方案包含：
+• 📋 任务概览
+• 📅 三阶段时间规划
+• 📊 进度追踪模板
+• 📝 学习资源清单
+• ✓ Checklist
+
+你可以查看并调整拆分方案。祝学习顺利！`;
+
+                    addAIMessage(completeMsg);
+
+                    // 填充到对应的Markdown字段
+                    if (currentAITarget === 'create') {
+                        document.getElementById('taskMarkdown').value = markdown;
+                    } else {
+                        document.getElementById('editMarkdown').value = markdown;
+                    }
+
+                    showToast('✅ 拆分完成', '任务已拆分为详细的行动计划');
+
+                    // 3秒后自动关闭
+                    setTimeout(() => {
+                        closeAISplitModal();
+                    }, 3000);
+                }, 1500);
+            }, 500);
+        }
+
+        function resetAIChat() {
+            // 重置对话上下文
+            aiChatContext = {
+                deadline: null,
+                dailyTime: null,
+                background: null,
+                special: null,
+                splitStyle: 'balanced'
+            };
+
+            // 清空输入
+            document.getElementById('aiUserInput').value = '';
+
+            // 重置对话历史（保留欢迎消息）
+            const chatHistory = document.getElementById('aiChatHistory');
+            const welcomeMsg = chatHistory.querySelector('.ai-message');
+            chatHistory.innerHTML = '';
+            if (welcomeMsg) {
+                chatHistory.appendChild(welcomeMsg);
+            }
+        }
+
+        function generateTaskSplit(goal, deadline, dailyTime, background, special, style) {
+            // 模拟AI生成任务拆分
+            const today = new Date();
+            const deadlineDate = deadline ? new Date(deadline) : new Date(today.getTime() + 90 * 24 * 60 * 60 * 1000);
+            const daysTotal = Math.ceil((deadlineDate - today) / (1000 * 60 * 60 * 24));
+            const weeksTotal = Math.ceil(daysTotal / 7);
+
+            const markdown = `# ${goal}
+
+## 📋 任务概览
+
+**目标**: ${goal}
+**总时长**: ${weeksTotal} 周 (${daysTotal} 天)
+**每日投入**: ${dailyTime} 分钟
+**拆分风格**: ${style === 'balanced' ? '平衡式' : '渐进式'}
+
+${background ? `## 🎯 当前基础\n\n${background}\n` : ''}
+
+${special ? `## 💡 特别关注\n\n${special}\n` : ''}
+
+## 📅 时间规划
+
+### 第1阶段：基础准备 (第1-${Math.ceil(weeksTotal * 0.3)}周)
+
+**目标**: 建立知识框架和基础能力
+
+#### 行动计划
+1. 制定详细学习计划
+2. 收集学习资源和材料
+3. 建立学习环境和习惯
+4. 评估当前水平和差距
+
+#### Checklist
+- [ ] 完成学习资源收集
+- [ ] 建立每日学习计划表
+- [ ] 完成初始水平测试
+- [ ] 准备学习工具和环境
+
+### 第2阶段：能力提升 (第${Math.ceil(weeksTotal * 0.3) + 1}-${Math.ceil(weeksTotal * 0.7)}周)
+
+**目标**: 系统学习和能力提升
+
+#### 行动计划
+1. 按模块系统学习
+2. 定期练习和测试
+3. 记录学习笔记
+4. 分析薄弱环节
+
+#### Checklist
+- [ ] 完成核心模块学习
+- [ ] 每周完成${Math.ceil(dailyTime * 7 / 60)}小时练习
+- [ ] 整理学习笔记和错题集
+- [ ] 参加阶段性测试
+
+### 第3阶段：强化冲刺 (第${Math.ceil(weeksTotal * 0.7) + 1}-${weeksTotal}周)
+
+**目标**: 查漏补缺和模拟实战
+
+#### 行动计划
+1. 模拟考试练习
+2. 针对性突破弱项
+3. 调整心态和状态
+4. 最后复习和总结
+
+#### Checklist
+- [ ] 完成至少3次完整模拟
+- [ ] 解决所有遗留问题
+- [ ] 调整作息和心态
+- [ ] 准备考试当天物品
+
+## 📊 进度追踪
+
+### 每日任务模板
+- 学习时间: ${dailyTime}分钟
+- 复习时间: 15分钟
+- 笔记整理: 10分钟
+
+### 每周检查点
+- 本周学习时长: ___ 小时
+- 完成进度: ___ %
+- 遇到的困难: ___
+- 下周调整: ___
+
+## 📝 学习资源
+
+### 推荐材料
+- [ ] 官方指南和教材
+- [ ] 在线课程或视频
+- [ ] 练习题库
+- [ ] 模拟考试
+
+### 辅助工具
+- [ ] 学习App
+- [ ] 笔记软件
+- [ ] 计时器
+- [ ] 进度追踪表
+
+---
+*💡 此拆分方案由 AI 生成，请根据实际情况调整。建议每周回顾进度，动态调整计划。*
+`;
+
+            return markdown;
+        }
+
+        // Delete task
+        function deleteTask(button) {
+            if (confirm('确定要删除这个任务吗？')) {
+                const card = button.closest('.task-card');
+                card.style.transform = 'scale(0)';
+                card.style.opacity = '0';
+                setTimeout(() => card.remove(), 200);
+                showToast('🗑 任务已删除', '任务已成功删除');
+            }
+        }
+
+        // Show toast notification
+        function showToast(title, message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <div class="toast-icon">🎉</div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Close modal on outside click
+        document.getElementById('taskModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Initialize XP preview
+        updateXPPreview();
+    </script>
+</body>
+</html>

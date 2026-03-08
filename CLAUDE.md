@@ -1,16 +1,19 @@
 # 游戏化待办事项系统
 
+## 语言
+
+**中文**
+
 ## 项目概要
 
 **项目**：游戏化待办应用 
-**核心理念**：理解我、帮助我成长、不评判我
 
 ---
 
 ## 启动检查清单
 
 1. ✅ 读取 `docs/progress.md` - 了解当前进度和任务状态
-2. ✅ 读取 `docs/requirements/requirements_document_v1.md` - 回顾核心需求
+2. ✅ 读取 `docs/requirements/requirements_document.md` - 回顾核心需求
 3. ✅ 确认当前任务状态（⏳ 待开始 / 🔄 进行中 / ✅ 已完成）
 4. ✅ 检查是否有阻塞项需要处理
 5. ✅ 向用户简要汇报当前进度，确认下一步行动
@@ -22,7 +25,7 @@
 ### 🔴 P0 - 每次启动必须加载（最高优先级）
 
 - `docs/progress.md` - **项目进度、任务状态、阻塞风险**（动态更新）
-- `docs/requirements/requirements_document_v1.md` - **总体目标和功能需求**（静态）
+- `docs/requirements/requirements_document.md` - **总体目标和功能需求**（静态）
 
 ### 🟡 P1 - 根据任务类型加载（中优先级）
 
@@ -32,8 +35,7 @@
 
 ### 🟢 P2 - 需要时加载（低优先级）
 
-- `docs/requirements/discussions/discussion_record_01.md` - 第一次多角色讨论会
-- `docs/requirements/discussions/discussion_record_02_longterm_learning.md` - 第二次讨论会
+- **系统目录结构** → `docs/directory_structure.md`
 
 ---
 
@@ -147,35 +149,12 @@
 - 更新"下一步"任务
 - 添加阶段变更记录
 
----
+### 文件/目录变更时
 
-## 核心设计原则
-
-### 产品理念（详见 `docs/requirements/requirements_document.md`）
-
-1. **理解我、帮助我、不评判我** - 所有文案、交互、反馈必须通过此检查
-2. **数据服务于理解，而非焦虑** - 强调"发现"而非"问题"
-3. **提供选择权** - 游戏/专业模式切换、极简模式可选
-4. **AI 是建议者，不是命令者** - 用户有最终编辑权
-
-### 文案审核清单
-
-所有用户可见文案必须通过：
-- [ ] 是否使用评判性语言？("你应该"、"你错了")
-- [ ] 是否制造焦虑？("落后"、"逾期"、"警告")
-- [ ] 是否提供可操作建议？
-- [ ] 是否强调"发现"而非"问题"？
-- [ ] 是否尊重用户选择权？
+**每个阶段执行后，如果有文件或目录的新增/删除/重命名，必须同步更新 `docs/directory_structure.md`**：
+- 新增文件/目录时，添加到对应层级
+- 删除文件/目录时，从文档中移除
+- 重命名文件/目录时，更新文档中的路径
+- 保持目录结构文档与实际项目状态一致
 
 ---
-
-## 文档维护原则
-
-### docs/progress.md
-- **性质**：动态项目进度
-- **更新频率**：每次完成任务后
-- **内容**：当前阶段、任务状态、阻塞风险
-
-### docs/ 目录结构
-- **详细说明**：见 `docs/directory_structure.md`
-- **包含**：requirements/（业务需求）、design/（设计方案）、meetings/（会议记录）
